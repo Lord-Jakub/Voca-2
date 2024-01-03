@@ -1,0 +1,175 @@
+{
+  "Statements": [
+    {
+      "Node": {
+        "Name": {
+          "Type": 20,
+          "Value": "main",
+          "Line": 1,
+          "LinePos": 8
+        },
+        "Arguments": [],
+        "Type": {
+          "Type": 21,
+          "Value": "void",
+          "Line": 0,
+          "LinePos": 0
+        },
+        "Body": [
+          {
+            "Node": null
+          },
+          {
+            "Node": {
+              "Name": {
+                "Type": 20,
+                "Value": "i",
+                "Line": 2,
+                "LinePos": 9
+              },
+              "Type": {
+                "Type": 21,
+                "Value": "int",
+                "Line": 2,
+                "LinePos": 7
+              },
+              "Value": {
+                "Left": {
+                  "Type": 18,
+                  "Value": "5",
+                  "Line": 2,
+                  "LinePos": 13
+                },
+                "Operator": {
+                  "Type": 5,
+                  "Value": "+",
+                  "Line": 2,
+                  "LinePos": 14
+                },
+                "Right": {
+                  "Left": {
+                    "Left": {
+                      "Type": 18,
+                      "Value": "5",
+                      "Line": 2,
+                      "LinePos": 15
+                    },
+                    "Operator": {
+                      "Type": 7,
+                      "Value": "*",
+                      "Line": 2,
+                      "LinePos": 16
+                    },
+                    "Right": {
+                      "Type": 18,
+                      "Value": "3",
+                      "Line": 2,
+                      "LinePos": 17
+                    }
+                  },
+                  "Operator": {
+                    "Type": 5,
+                    "Value": "+",
+                    "Line": 2,
+                    "LinePos": 18
+                  },
+                  "Right": {
+                    "Type": 18,
+                    "Value": "5",
+                    "Line": 2,
+                    "LinePos": 19
+                  }
+                }
+              }
+            }
+          },
+          {
+            "Node": null
+          },
+          {
+            "Node": {
+              "Name": {
+                "Type": 20,
+                "Value": "name",
+                "Line": 3,
+                "LinePos": 15
+              },
+              "Type": {
+                "Type": 21,
+                "Value": "string",
+                "Line": 3,
+                "LinePos": 10
+              },
+              "Value": {
+                "Type": 19,
+                "Value": "Jakub",
+                "Line": 3,
+                "LinePos": 25
+              }
+            }
+          },
+          {
+            "Node": null
+          },
+          {
+            "Node": {
+              "Value": {
+                "Type": 20,
+                "Value": "i",
+                "Line": 4,
+                "LinePos": 11
+              }
+            }
+          },
+          {
+            "Node": null
+          },
+          {
+            "Node": {
+              "Value": {
+                "Left": {
+                  "Type": 19,
+                  "Value": "Ahoj",
+                  "Line": 5,
+                  "LinePos": 16
+                },
+                "Operator": {
+                  "Type": 5,
+                  "Value": "+",
+                  "Line": 5,
+                  "LinePos": 18
+                },
+                "Right": {
+                  "Left": {
+                    "Type": 19,
+                    "Value": " ",
+                    "Line": 5,
+                    "LinePos": 22
+                  },
+                  "Operator": {
+                    "Type": 5,
+                    "Value": "+",
+                    "Line": 5,
+                    "LinePos": 24
+                  },
+                  "Right": {
+                    "Type": 20,
+                    "Value": "name",
+                    "Line": 5,
+                    "LinePos": 29
+                  }
+                }
+              }
+            }
+          },
+          {
+            "Node": null
+          },
+          {
+            "Node": null
+          }
+        ]
+      }
+    }
+  ]
+}

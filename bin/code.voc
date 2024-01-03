@@ -1,0 +1,6 @@
+func main(){
+    int i = 5+5*3+5
+    string name = "Jakub"
+    print(i)
+    print("Ahoj" + " " + name)
+}
