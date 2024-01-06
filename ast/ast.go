@@ -33,11 +33,15 @@ type FuncDeclaration struct {
 	Body      []Statement
 }
 type ReturnStatement struct {
-	ReturnValue []lexer.Token
+	Value any
 }
 type VariableDeclaration struct {
 	Name  lexer.Token
 	Type  lexer.Token
+	Value any
+}
+type VariableAssignment struct {
+	Name  lexer.Token
 	Value any
 }
 type PrintStatement struct {
@@ -45,5 +49,5 @@ type PrintStatement struct {
 }
 type FuncCall struct {
 	Name      lexer.Token
-	Arguments []ExpressionStatement
+	Arguments []any
 }
