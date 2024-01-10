@@ -1,11 +1,4 @@
-func Add(int x, int y) int {
-    return x+y
-}
+
 func main(){
     int i = 5+5*3+5
-    i = Add(5+6)
-    i++
-    string name = "Jakub"
-    print(i)
-    print("Ahoj" + " " + name)
 }

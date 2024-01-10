@@ -1,91 +1,14 @@
 {
   "Statements": [
     {
-      "Node": {
-        "Name": {
-          "Type": 20,
-          "Value": "Add",
-          "Line": 1,
-          "LinePos": 7
-        },
-        "Arguments": [
-          {
-            "Name": {
-              "Type": 20,
-              "Value": "x",
-              "Line": 1,
-              "LinePos": 13
-            },
-            "Type": {
-              "Type": 21,
-              "Value": "int",
-              "Line": 1,
-              "LinePos": 11
-            },
-            "Value": null
-          },
-          {
-            "Name": {
-              "Type": 20,
-              "Value": "y",
-              "Line": 1,
-              "LinePos": 20
-            },
-            "Type": {
-              "Type": 21,
-              "Value": "int",
-              "Line": 1,
-              "LinePos": 18
-            },
-            "Value": null
-          }
-        ],
-        "Type": {
-          "Type": 21,
-          "Value": "int",
-          "Line": 1,
-          "LinePos": 25
-        },
-        "Body": [
-          {
-            "Node": null
-          },
-          {
-            "Node": {
-              "Value": {
-                "Left": {
-                  "Type": 20,
-                  "Value": "x",
-                  "Line": 2,
-                  "LinePos": 12
-                },
-                "Operator": {
-                  "Type": 5,
-                  "Value": "+",
-                  "Line": 2,
-                  "LinePos": 13
-                },
-                "Right": {
-                  "Type": 20,
-                  "Value": "y",
-                  "Line": 2,
-                  "LinePos": 14
-                }
-              }
-            }
-          },
-          {
-            "Node": null
-          }
-        ]
-      }
+      "Node": null
     },
     {
       "Node": {
         "Name": {
           "Type": 20,
           "Value": "main",
-          "Line": 4,
+          "Line": 2,
           "LinePos": 9
         },
         "Arguments": [],
@@ -104,221 +27,60 @@
               "Name": {
                 "Type": 20,
                 "Value": "i",
-                "Line": 5,
+                "Line": 3,
                 "LinePos": 9
               },
               "Type": {
                 "Type": 21,
                 "Value": "int",
-                "Line": 5,
+                "Line": 3,
                 "LinePos": 7
               },
               "Value": {
                 "Left": {
                   "Type": 18,
-                  "Value": "5",
-                  "Line": 5,
+                  "Value": 5,
+                  "Line": 3,
                   "LinePos": 13
                 },
                 "Operator": {
                   "Type": 5,
                   "Value": "+",
-                  "Line": 5,
+                  "Line": 3,
                   "LinePos": 14
                 },
                 "Right": {
                   "Left": {
                     "Left": {
                       "Type": 18,
-                      "Value": "5",
-                      "Line": 5,
+                      "Value": 5,
+                      "Line": 3,
                       "LinePos": 15
                     },
                     "Operator": {
                       "Type": 7,
                       "Value": "*",
-                      "Line": 5,
+                      "Line": 3,
                       "LinePos": 16
                     },
                     "Right": {
                       "Type": 18,
-                      "Value": "3",
-                      "Line": 5,
+                      "Value": 3,
+                      "Line": 3,
                       "LinePos": 17
                     }
                   },
                   "Operator": {
                     "Type": 5,
                     "Value": "+",
-                    "Line": 5,
+                    "Line": 3,
                     "LinePos": 18
                   },
                   "Right": {
                     "Type": 18,
-                    "Value": "5",
-                    "Line": 5,
+                    "Value": 5,
+                    "Line": 3,
                     "LinePos": 19
-                  }
-                }
-              }
-            }
-          },
-          {
-            "Node": null
-          },
-          {
-            "Node": {
-              "Name": {
-                "Type": 20,
-                "Value": "i",
-                "Line": 6,
-                "LinePos": 5
-              },
-              "Value": {
-                "Name": {
-                  "Type": 20,
-                  "Value": "Add",
-                  "Line": 6,
-                  "LinePos": 11
-                },
-                "Arguments": [
-                  {
-                    "Left": {
-                      "Type": 18,
-                      "Value": "5",
-                      "Line": 6,
-                      "LinePos": 13
-                    },
-                    "Operator": {
-                      "Type": 5,
-                      "Value": "+",
-                      "Line": 6,
-                      "LinePos": 14
-                    },
-                    "Right": {
-                      "Type": 18,
-                      "Value": "6",
-                      "Line": 6,
-                      "LinePos": 15
-                    }
-                  }
-                ]
-              }
-            }
-          },
-          {
-            "Node": null
-          },
-          {
-            "Node": {
-              "Name": {
-                "Type": 20,
-                "Value": "i",
-                "Line": 7,
-                "LinePos": 5
-              },
-              "Value": {
-                "Left": {
-                  "Type": 20,
-                  "Value": "i",
-                  "Line": 7,
-                  "LinePos": 5
-                },
-                "Operator": {
-                  "Type": 5,
-                  "Value": "+",
-                  "Line": 7,
-                  "LinePos": 6
-                },
-                "Right": {
-                  "Type": 18,
-                  "Value": 1,
-                  "Line": 0,
-                  "LinePos": 0
-                }
-              }
-            }
-          },
-          {
-            "Node": null
-          },
-          {
-            "Node": null
-          },
-          {
-            "Node": null
-          },
-          {
-            "Node": {
-              "Name": {
-                "Type": 20,
-                "Value": "name",
-                "Line": 8,
-                "LinePos": 15
-              },
-              "Type": {
-                "Type": 21,
-                "Value": "string",
-                "Line": 8,
-                "LinePos": 10
-              },
-              "Value": {
-                "Type": 19,
-                "Value": "Jakub",
-                "Line": 8,
-                "LinePos": 25
-              }
-            }
-          },
-          {
-            "Node": null
-          },
-          {
-            "Node": {
-              "Value": {
-                "Type": 20,
-                "Value": "i",
-                "Line": 9,
-                "LinePos": 11
-              }
-            }
-          },
-          {
-            "Node": null
-          },
-          {
-            "Node": {
-              "Value": {
-                "Left": {
-                  "Type": 19,
-                  "Value": "Ahoj",
-                  "Line": 10,
-                  "LinePos": 16
-                },
-                "Operator": {
-                  "Type": 5,
-                  "Value": "+",
-                  "Line": 10,
-                  "LinePos": 18
-                },
-                "Right": {
-                  "Left": {
-                    "Type": 19,
-                    "Value": " ",
-                    "Line": 10,
-                    "LinePos": 22
-                  },
-                  "Operator": {
-                    "Type": 5,
-                    "Value": "+",
-                    "Line": 10,
-                    "LinePos": 24
-                  },
-                  "Right": {
-                    "Type": 20,
-                    "Value": "name",
-                    "Line": 10,
-                    "LinePos": 29
                   }
                 }
               }

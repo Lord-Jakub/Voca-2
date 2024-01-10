@@ -4,6 +4,7 @@ import (
 	"Voca-2/lib"
 	"errors"
 	"fmt"
+	"strconv"
 	"unicode"
 )
 
@@ -96,20 +97,35 @@ func Lex(input string) ([]Token, error) {
 		case unicode.IsDigit(rune(input[pos])):
 			//Numbers
 			var num string
+			isFloat := false
 			for pos < len(input) && (unicode.IsDigit(rune(input[pos])) || string(input[pos]) == ".") {
 				num += string(input[pos])
+				if string(input[pos]) == "." {
+					isFloat = true
+				}
 				pos++
 				linePos++
 
 			}
 			pos--
 			linePos--
-			tokens = append(tokens, Token{
-				Type:    Int,
-				Value:   num,
-				Line:    line,
-				LinePos: linePos,
-			})
+			if isFloat {
+				number, _ := strconv.ParseFloat(num, 64)
+				tokens = append(tokens, Token{
+					Type:    Int,
+					Value:   number,
+					Line:    line,
+					LinePos: linePos,
+				})
+			} else {
+				number, _ := strconv.Atoi(num)
+				tokens = append(tokens, Token{
+					Type:    Int,
+					Value:   number,
+					Line:    line,
+					LinePos: linePos,
+				})
+			}
 
 		case string(input[pos]) == "\"":
 			//Strings
