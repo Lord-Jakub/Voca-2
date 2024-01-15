@@ -60,9 +60,10 @@ var symbolMap = map[byte]TokenType{
 	'>':  MoreThan,
 	';':  NewLine,
 }
-var KeyWords = []string{"print", "if", "else", "while", "func", "return", "import", "string", "int", "float", "bool", "void"}
+var KeyWords = []string{"if", "else", "while", "func", "return", "import", "string", "int", "float", "bool", "void"}
 
 func Lex(input string) ([]Token, error) {
+	input = "func print(string s){}\n" + "func append(string s1, string s2) string {}\n" + input
 	var tokens []Token
 	var err error = nil
 	pos := 0

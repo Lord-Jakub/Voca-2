@@ -155,21 +155,6 @@ func Parse(tokens []lexer.Token, Variables map[string]string) ([]ast.Statement, 
 					return program.Statements, err
 				}
 				statement.Node = funcDeclaration
-			case "print":
-				var printStatement ast.PrintStatement
-				var expression []lexer.Token
-				i += 2
-				for tokens[i].Type != lexer.CloseParen {
-					expression = append(expression, tokens[i])
-					i++
-				}
-				value, _, err := ParseExpression(expression, Variables)
-				if err != nil {
-					return program.Statements, err
-				}
-
-				printStatement.Value = value
-				statement.Node = printStatement
 			case "return":
 				var returnStatement ast.ReturnStatement
 				var expression []lexer.Token

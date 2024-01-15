@@ -34,23 +34,9 @@ func astToJson(ast ast.Program) error {
 	return nil
 }
 
-type Program struct {
-	input       string
-	err         error
-	tokens      []lexer.Token
-	program     ast.Program
-	generateAST bool
-	args        []string
-	file        string
-	output      string
-	Arch        string
-	OS          string
-	loadAST     bool
-}
-
-func input(program Program, i int) (Program, int) {
-	if i+1 < len(program.args) {
-		program.file = program.args[i+1]
+func input(program compiler.Program, i int) (compiler.Program, int) {
+	if i+1 < len(program.Args) {
+		program.File = program.Args[i+1]
 		i++
 	} else {
 		lib.Print("No input file specified")
@@ -63,7 +49,7 @@ func help() {
 	lib.Print(" \\ \\      / /    /  __  \\      /  __  \\       /  \\")
 	lib.Print("  \\ \\    / /    /  /   \\ \\    /  /  \\ \\      / /\\ \\")
 	lib.Print("   \\ \\  / /    |  |     | |  |  |           / /__\\ \\")
-	lib.Print("    \\ \\/ /     |  |     | |  |  |          / /____\\ \\")
+	lib.Print("    \\ \\/ /     |  |     | |  |  |             / /____\\ \\")
 	lib.Print("     \\  /       \\ \\____/ /   \\  \\__/  /   / /      \\ \\")
 	lib.Print("      \\/         \\______/     \\______/   / /        \\ \\")
 
@@ -79,27 +65,27 @@ func help() {
 	lib.Print("  -loadAST - load AST from ast.json")
 	os.Exit(0)
 }
-func output(program Program, i int) (Program, int) {
-	if i+1 < len(program.args) {
-		program.output = program.args[i+1]
+func output(program compiler.Program, i int) (compiler.Program, int) {
+	if i+1 < len(program.Args) {
+		program.Output = program.Args[i+1]
 		i++
 	} else {
 		lib.Print("No output file specified")
 	}
 	return program, i
 }
-func arch(program Program, i int) (Program, int) {
-	if i+1 < len(program.args) {
-		program.Arch = program.args[i+1]
+func arch(program compiler.Program, i int) (compiler.Program, int) {
+	if i+1 < len(program.Args) {
+		program.Arch = program.Args[i+1]
 		i++
 	} else {
 		lib.Print("No architecture specified")
 	}
 	return program, i
 }
-func os_var(program Program, i int) (Program, int) {
-	if i+1 < len(program.args) {
-		program.OS = program.args[i+1]
+func os_var(program compiler.Program, i int) (compiler.Program, int) {
+	if i+1 < len(program.Args) {
+		program.OS = program.Args[i+1]
 		i++
 	} else {
 		lib.Print("No operating system specified")
@@ -107,11 +93,11 @@ func os_var(program Program, i int) (Program, int) {
 	return program, i
 }
 func main() {
-	program := Program{args: os.Args[1:], generateAST: false, file: "main.voc", loadAST: false}
-	if len(program.args) >= 1 {
+	program := compiler.Program{Args: os.Args, GenerateAST: false, File: "main.voc", LoadAST: false, Ir: false}
+	if len(program.Args) >= 1 {
 		i := 0
-		for i < len(program.args) {
-			switch program.args[i] {
+		for i < len(program.Args) {
+			switch program.Args[i] {
 			case "-i":
 				program, i = input(program, i)
 			case "-input":
@@ -121,9 +107,9 @@ func main() {
 			case "-h":
 				help()
 			case "-ast":
-				program.generateAST = true
+				program.GenerateAST = true
 			case "-a":
-				program.generateAST = true
+				program.GenerateAST = true
 			case "-output":
 				program, i = output(program, i)
 			case "-o":
@@ -133,52 +119,52 @@ func main() {
 			case "-os":
 				program, i = os_var(program, i)
 			case "-loadAST":
-				program.loadAST = true
+				program.LoadAST = true
+			case "-ir":
+				program.Ir = true
+
 			}
 			i++
 		}
 
 	}
 
-	if program.output == "" {
-		program.output = strings.Replace(program.file, ".voc", "", -1)
+	if program.Output == "" {
+		program.Output = strings.Replace(program.File, ".voc", "", -1)
 	}
-	if program.err != nil {
-		panic(program.err)
-	}
-	if program.loadAST {
+
+	if program.LoadAST {
 		data, err := os.ReadFile("ast.json")
 		if err != nil {
-			lib.Print("Can't load file: " + err.Error())
+			fmt.Print("Can't load file: " + err.Error())
 			log.Fatal(err)
 		}
-		err = json.Unmarshal(data, &program.program)
-		if err != nil {
-			panic(err)
-		}
+		err = json.Unmarshal(data, &program.Program)
+		program.Errs = append(program.Errs, err)
 	} else {
-		data, err := os.ReadFile(program.file)
+		data, err := os.ReadFile(program.File)
 		if err != nil {
-			lib.Print("Can't load file: " + err.Error())
+			fmt.Print("Can't load file: " + err.Error())
 			log.Fatal(err)
 		}
-		program.input = string(data)
-		program.input = strings.Replace(program.input, "\r", " ", -1)
-		program.tokens, err = lexer.Lex(program.input)
-		if err != nil {
-			panic(err)
+		program.Input = string(data)
+		program.Input = strings.Replace(program.Input, "\r", " ", -1)
+		program.Tokens, err = lexer.Lex(program.Input)
+		program.Errs = append(program.Errs, err)
+		program.Program, err = parser.New(program.Tokens)
+		program.Errs = append(program.Errs, err)
+		if program.GenerateAST {
+			err := astToJson(program.Program)
+			program.Errs = append(program.Errs, err)
 		}
-		program.program, err = parser.New(program.tokens)
-		if err != nil {
-			panic(err)
-		}
-		if program.generateAST {
-			err := astToJson(program.program)
-			if err != nil {
-				panic(err)
+
+		errs := compiler.New(program)
+		for i := 0; i < len(errs); i++ {
+			if errs[i] != nil {
+				fmt.Println(errs[i])
 			}
 		}
-		fmt.Println(compiler.GenerateIR(program.program))
+
 	}
 
 }

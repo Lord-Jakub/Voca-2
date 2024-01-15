@@ -44,9 +44,7 @@ type VariableAssignment struct {
 	Name  lexer.Token
 	Value any
 }
-type PrintStatement struct {
-	Value any
-}
+
 type FuncCall struct {
 	Name      lexer.Token
 	Arguments []any

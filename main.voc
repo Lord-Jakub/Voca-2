@@ -1,4 +1,8 @@
 
 func main(){
     int i = 5+5*3+5
+    string s = "Ahoj"
+    string s2 = " Světe"
+    string s3 = s+s2
+    print(s3)
 }
