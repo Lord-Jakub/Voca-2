@@ -20,6 +20,8 @@ var Functions = make(map[string]string)
 
 func MapFunctions(tokens []lexer.Token) (map[string]string, error) {
 	var functions = make(map[string]string)
+	functions["print"] = "void"
+	functions["append"] = "string"
 	for i := 0; i < len(tokens); i++ {
 		if tokens[i].Type == lexer.Keyword && tokens[i].Value == "func" {
 			name := tokens[i+1].Value
@@ -33,6 +35,8 @@ func MapFunctions(tokens []lexer.Token) (map[string]string, error) {
 }
 func Parse(tokens []lexer.Token, Variables map[string]string) ([]ast.Statement, error) {
 	var program ast.Program
+	program.Statements = append(program.Statements, ast.Statement{Node: ast.ExternFuncDeclaration{Name: lexer.Token{Type: lexer.Keyword, Value: "print"}, Arguments: []any{ast.VariableDeclaration{Type: lexer.Token{Type: lexer.Keyword, Value: "string"}, Name: lexer.Token{Type: lexer.Identifier, Value: "s"}}}, Type: lexer.Token{Type: lexer.Keyword, Value: "void"}}})
+	program.Statements = append(program.Statements, ast.Statement{Node: ast.ExternFuncDeclaration{Name: lexer.Token{Type: lexer.Keyword, Value: "append"}, Arguments: []any{ast.VariableDeclaration{Type: lexer.Token{Type: lexer.Keyword, Value: "string"}, Name: lexer.Token{Type: lexer.Identifier, Value: "s1"}}, ast.VariableDeclaration{Type: lexer.Token{Type: lexer.Keyword, Value: "string"}, Name: lexer.Token{Type: lexer.Identifier, Value: "s2"}}}, Type: lexer.Token{Type: lexer.Keyword, Value: "string"}}})
 	var err error = nil
 	for i := 0; i < len(tokens); i++ {
 		var statement ast.Statement
@@ -155,6 +159,48 @@ func Parse(tokens []lexer.Token, Variables map[string]string) ([]ast.Statement, 
 					return program.Statements, err
 				}
 				statement.Node = funcDeclaration
+			case "extern_func":
+				var funcDeclaration ast.ExternFuncDeclaration
+				funcDeclaration.Name = tokens[i+1]
+				funcDeclaration.Arguments = make([]any, 0)
+				i += 3
+				for tokens[i].Type != lexer.CloseParen {
+
+					if tokens[i].Type == lexer.Keyword {
+						var arg ast.VariableDeclaration
+						if tokens[i].Value == "int" || tokens[i].Value == "string" || tokens[i].Value == "float" || tokens[i].Value == "bool" {
+							i++
+							arg = ast.VariableDeclaration{Type: tokens[i-1], Name: tokens[i]}
+						} else {
+							err = errors.New(fmt.Sprintf("Expected type on line: %d at position %d, not '%s'", tokens[i].Line, tokens[i].LinePos, tokens[i].Value))
+							return program.Statements, err
+						}
+						funcDeclaration.Arguments = append(funcDeclaration.Arguments, arg)
+					} else if tokens[i].Type == lexer.Comma {
+
+					} else {
+
+						err = errors.New(fmt.Sprintf("Expected argument on line: %d at position %d, not '%s'", tokens[i].Line, tokens[i].LinePos, tokens[i].Value))
+						return program.Statements, err
+					}
+
+					if err != nil {
+						return program.Statements, err
+					}
+					i++
+				}
+				i++
+				if tokens[i].Value == "string" || tokens[i].Value == "int" || tokens[i].Value == "float" || tokens[i].Value == "bool" {
+					funcDeclaration.Type = tokens[i]
+					i++
+				} else if tokens[i].Type == lexer.NewLine {
+					funcDeclaration.Type = lexer.Token{Type: lexer.Keyword, Value: "void"}
+				} else {
+					err = errors.New(fmt.Sprintf("Expected type or { on line: %d at position %d, not '%s'", tokens[i].Line, tokens[i].LinePos, tokens[i].Value))
+					return program.Statements, err
+				}
+
+				statement.Node = funcDeclaration
 			case "return":
 				var returnStatement ast.ReturnStatement
 				var expression []lexer.Token
@@ -169,7 +215,55 @@ func Parse(tokens []lexer.Token, Variables map[string]string) ([]ast.Statement, 
 				}
 				returnStatement.Value = value
 				statement.Node = returnStatement
+			case "if":
+				var ifStatement ast.IfStatement
+				var expression []lexer.Token
+				var bodyTokens []lexer.Token
+				i += 1
+				for tokens[i].Type != lexer.OpenBrace {
+					expression = append(expression, tokens[i])
+					i++
+				}
+				condition, err := ParseBool(expression, Variables)
+				if err != nil {
+					return program.Statements, err
+				}
+				ifStatement.Condition = condition
+				i++
+				n := 1
+				bodyTokens = make([]lexer.Token, 0)
+				ifStatement.Consequence = make([]ast.Statement, 0)
+				ifStatement.Alternative = make([]ast.Statement, 0)
+				for n > 0 {
+					if tokens[i].Type == lexer.OpenBrace {
+						n++
+					} else if tokens[i].Type == lexer.CloseBrace {
+						n--
+					}
+					bodyTokens = append(bodyTokens, tokens[i])
+					i++
+				}
+				ifStatement.Consequence, err = Parse(bodyTokens, Variables)
+				if err != nil {
+					return program.Statements, err
+				}
+				bodyTokens = make([]lexer.Token, 0)
+				if tokens[i].Value == "else" {
+					i += 2
+					n := 1
+					for n > 0 {
+						if tokens[i].Type == lexer.OpenBrace {
+							n++
+						} else if tokens[i].Type == lexer.CloseBrace {
+							n--
+						}
+						bodyTokens = append(bodyTokens, tokens[i])
+						i++
+					}
+					ifStatement.Alternative, err = Parse(bodyTokens, Variables)
+				}
 
+				statement.Node = ifStatement
 			}
 		case lexer.Identifier:
 			if tokens[i+1].Type == lexer.OpenParen {
@@ -270,6 +364,20 @@ func Parse(tokens []lexer.Token, Variables map[string]string) ([]ast.Statement, 
 	}
 	return program.Statements, err
 }
+func ParseBool(tokens []lexer.Token, Variables map[string]string) (ast.BoolStatement, error) {
+	var boolStatement ast.BoolStatement
+	var err error = nil
+	i := 0
+	for tokens[i].Type != lexer.DoubleEqual && tokens[i].Type != lexer.NotEqual && tokens[i].Type != lexer.LessThan && tokens[i].Type != lexer.MoreThan {
+		i++
+	}
+
+	boolStatement.Condition1, _, err = ParseExpression(tokens[:i], Variables)
+	boolStatement.Operator = tokens[i]
+	boolStatement.Condition2, _, err = ParseExpression(tokens[i+1:], Variables)
+	return boolStatement, err
+}
+
 func IsNumber(token lexer.Token, Variables map[string]string) bool {
 	switch {
 	case token.Type == lexer.Int:

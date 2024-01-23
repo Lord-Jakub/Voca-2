@@ -5,4 +5,12 @@ func main(){
     string s2 = " Světe"
     string s3 = s+s2
     print(s3)
+    if 5+5 < 11{
+        print("Ano")
+    } else {
+        print("Ne")
+    }
+    if 5==5{
+        print("Ahoj")
+    }
 }

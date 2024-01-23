@@ -1,0 +1,17 @@
+void print(const char text[]) {
+}
+char* append(const char text1[], const char text2[]) {
+    return "";
+}
+
+int main(){
+    int i = 5;
+    if (i == 5) {
+        print("5 is 5");
+    }
+    else {
+        print("5 is not 5");
+    }
+    char* text = append("Hello ", "World");
+    return 0;
+}

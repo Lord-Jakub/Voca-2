@@ -3,24 +3,24 @@
     {
       "Node": {
         "Name": {
-          "Type": 20,
+          "Type": 21,
           "Value": "print",
-          "Line": 1,
-          "LinePos": 9
+          "Line": 0,
+          "LinePos": 0
         },
         "Arguments": [
           {
             "Name": {
               "Type": 20,
               "Value": "s",
-              "Line": 1,
-              "LinePos": 18
+              "Line": 0,
+              "LinePos": 0
             },
             "Type": {
               "Type": 21,
               "Value": "string",
-              "Line": 1,
-              "LinePos": 16
+              "Line": 0,
+              "LinePos": 0
             },
             "Value": null
           }
@@ -30,35 +30,30 @@
           "Value": "void",
           "Line": 0,
           "LinePos": 0
-        },
-        "Body": [
-          {
-            "Node": null
-          }
-        ]
+        }
       }
     },
     {
       "Node": {
         "Name": {
-          "Type": 20,
+          "Type": 21,
           "Value": "append",
-          "Line": 2,
-          "LinePos": 11
+          "Line": 0,
+          "LinePos": 0
         },
         "Arguments": [
           {
             "Name": {
               "Type": 20,
               "Value": "s1",
-              "Line": 2,
-              "LinePos": 21
+              "Line": 0,
+              "LinePos": 0
             },
             "Type": {
               "Type": 21,
               "Value": "string",
-              "Line": 2,
-              "LinePos": 18
+              "Line": 0,
+              "LinePos": 0
             },
             "Value": null
           },
@@ -66,14 +61,14 @@
             "Name": {
               "Type": 20,
               "Value": "s2",
-              "Line": 2,
-              "LinePos": 32
+              "Line": 0,
+              "LinePos": 0
             },
             "Type": {
               "Type": 21,
               "Value": "string",
-              "Line": 2,
-              "LinePos": 29
+              "Line": 0,
+              "LinePos": 0
             },
             "Value": null
           }
@@ -81,14 +76,9 @@
         "Type": {
           "Type": 21,
           "Value": "string",
-          "Line": 2,
-          "LinePos": 40
-        },
-        "Body": [
-          {
-            "Node": null
-          }
-        ]
+          "Line": 0,
+          "LinePos": 0
+        }
       }
     },
     {
@@ -99,7 +89,7 @@
         "Name": {
           "Type": 20,
           "Value": "main",
-          "Line": 4,
+          "Line": 2,
           "LinePos": 9
         },
         "Arguments": [],
@@ -111,6 +101,87 @@
         },
         "Body": [
           {
+            "Node": {
+              "Name": {
+                "Type": 21,
+                "Value": "print",
+                "Line": 0,
+                "LinePos": 0
+              },
+              "Arguments": [
+                {
+                  "Name": {
+                    "Type": 20,
+                    "Value": "s",
+                    "Line": 0,
+                    "LinePos": 0
+                  },
+                  "Type": {
+                    "Type": 21,
+                    "Value": "string",
+                    "Line": 0,
+                    "LinePos": 0
+                  },
+                  "Value": null
+                }
+              ],
+              "Type": {
+                "Type": 21,
+                "Value": "void",
+                "Line": 0,
+                "LinePos": 0
+              }
+            }
+          },
+          {
+            "Node": {
+              "Name": {
+                "Type": 21,
+                "Value": "append",
+                "Line": 0,
+                "LinePos": 0
+              },
+              "Arguments": [
+                {
+                  "Name": {
+                    "Type": 20,
+                    "Value": "s1",
+                    "Line": 0,
+                    "LinePos": 0
+                  },
+                  "Type": {
+                    "Type": 21,
+                    "Value": "string",
+                    "Line": 0,
+                    "LinePos": 0
+                  },
+                  "Value": null
+                },
+                {
+                  "Name": {
+                    "Type": 20,
+                    "Value": "s2",
+                    "Line": 0,
+                    "LinePos": 0
+                  },
+                  "Type": {
+                    "Type": 21,
+                    "Value": "string",
+                    "Line": 0,
+                    "LinePos": 0
+                  },
+                  "Value": null
+                }
+              ],
+              "Type": {
+                "Type": 21,
+                "Value": "string",
+                "Line": 0,
+                "LinePos": 0
+              }
+            }
+          },
+          {
             "Node": null
           },
           {
@@ -118,26 +189,26 @@
               "Name": {
                 "Type": 20,
                 "Value": "i",
-                "Line": 5,
+                "Line": 3,
                 "LinePos": 9
               },
               "Type": {
                 "Type": 21,
                 "Value": "int",
-                "Line": 5,
+                "Line": 3,
                 "LinePos": 7
               },
               "Value": {
                 "Left": {
                   "Type": 18,
                   "Value": 5,
-                  "Line": 5,
+                  "Line": 3,
                   "LinePos": 13
                 },
                 "Operator": {
                   "Type": 5,
                   "Value": "+",
-                  "Line": 5,
+                  "Line": 3,
                   "LinePos": 14
                 },
                 "Right": {
@@ -145,32 +216,32 @@
                     "Left": {
                       "Type": 18,
                       "Value": 5,
-                      "Line": 5,
+                      "Line": 3,
                       "LinePos": 15
                     },
                     "Operator": {
                       "Type": 7,
                       "Value": "*",
-                      "Line": 5,
+                      "Line": 3,
                       "LinePos": 16
                     },
                     "Right": {
                       "Type": 18,
                       "Value": 3,
-                      "Line": 5,
+                      "Line": 3,
                       "LinePos": 17
                     }
                   },
                   "Operator": {
                     "Type": 5,
                     "Value": "+",
-                    "Line": 5,
+                    "Line": 3,
                     "LinePos": 18
                   },
                   "Right": {
                     "Type": 18,
                     "Value": 5,
-                    "Line": 5,
+                    "Line": 3,
                     "LinePos": 19
                   }
                 }
@@ -185,19 +256,19 @@
               "Name": {
                 "Type": 20,
                 "Value": "s",
-                "Line": 6,
+                "Line": 4,
                 "LinePos": 12
               },
               "Type": {
                 "Type": 21,
                 "Value": "string",
-                "Line": 6,
+                "Line": 4,
                 "LinePos": 10
               },
               "Value": {
                 "Type": 19,
                 "Value": "Ahoj",
-                "Line": 6,
+                "Line": 4,
                 "LinePos": 21
               }
             }
@@ -210,20 +281,20 @@
               "Name": {
                 "Type": 20,
                 "Value": "s2",
-                "Line": 7,
+                "Line": 5,
                 "LinePos": 13
               },
               "Type": {
                 "Type": 21,
                 "Value": "string",
-                "Line": 7,
+                "Line": 5,
                 "LinePos": 10
               },
               "Value": {
                 "Type": 19,
-                "Value": " SvÄte",
-                "Line": 7,
-                "LinePos": 25
+                "Value": " Svete",
+                "Line": 5,
+                "LinePos": 24
               }
             }
           },
@@ -235,32 +306,32 @@
               "Name": {
                 "Type": 20,
                 "Value": "s3",
-                "Line": 8,
+                "Line": 6,
                 "LinePos": 13
               },
               "Type": {
                 "Type": 21,
                 "Value": "string",
-                "Line": 8,
+                "Line": 6,
                 "LinePos": 10
               },
               "Value": {
                 "Left": {
                   "Type": 20,
                   "Value": "s",
-                  "Line": 8,
+                  "Line": 6,
                   "LinePos": 17
                 },
                 "Operator": {
                   "Type": 5,
                   "Value": "+",
-                  "Line": 8,
+                  "Line": 6,
                   "LinePos": 18
                 },
                 "Right": {
                   "Type": 20,
                   "Value": "s2",
-                  "Line": 8,
+                  "Line": 6,
                   "LinePos": 20
                 }
               }
@@ -274,14 +345,14 @@
               "Name": {
                 "Type": 20,
                 "Value": "print",
-                "Line": 9,
+                "Line": 7,
                 "LinePos": 9
               },
               "Arguments": [
                 {
                   "Type": 20,
                   "Value": "s3",
-                  "Line": 9,
+                  "Line": 7,
                   "LinePos": 12
                 }
               ]
@@ -289,6 +360,399 @@
           },
           {
             "Node": null
+          },
+          {
+            "Node": {
+              "Condition": {
+                "Condition1": {
+                  "Left": {
+                    "Type": 18,
+                    "Value": 5,
+                    "Line": 8,
+                    "LinePos": 7
+                  },
+                  "Operator": {
+                    "Type": 5,
+                    "Value": "+",
+                    "Line": 8,
+                    "LinePos": 8
+                  },
+                  "Right": {
+                    "Type": 18,
+                    "Value": 5,
+                    "Line": 8,
+                    "LinePos": 9
+                  }
+                },
+                "Operator": {
+                  "Type": 16,
+                  "Value": "\u003c",
+                  "Line": 8,
+                  "LinePos": 11
+                },
+                "Condition2": {
+                  "Type": 18,
+                  "Value": 11,
+                  "Line": 8,
+                  "LinePos": 14
+                }
+              },
+              "Consequence": [
+                {
+                  "Node": {
+                    "Name": {
+                      "Type": 21,
+                      "Value": "print",
+                      "Line": 0,
+                      "LinePos": 0
+                    },
+                    "Arguments": [
+                      {
+                        "Name": {
+                          "Type": 20,
+                          "Value": "s",
+                          "Line": 0,
+                          "LinePos": 0
+                        },
+                        "Type": {
+                          "Type": 21,
+                          "Value": "string",
+                          "Line": 0,
+                          "LinePos": 0
+                        },
+                        "Value": null
+                      }
+                    ],
+                    "Type": {
+                      "Type": 21,
+                      "Value": "void",
+                      "Line": 0,
+                      "LinePos": 0
+                    }
+                  }
+                },
+                {
+                  "Node": {
+                    "Name": {
+                      "Type": 21,
+                      "Value": "append",
+                      "Line": 0,
+                      "LinePos": 0
+                    },
+                    "Arguments": [
+                      {
+                        "Name": {
+                          "Type": 20,
+                          "Value": "s1",
+                          "Line": 0,
+                          "LinePos": 0
+                        },
+                        "Type": {
+                          "Type": 21,
+                          "Value": "string",
+                          "Line": 0,
+                          "LinePos": 0
+                        },
+                        "Value": null
+                      },
+                      {
+                        "Name": {
+                          "Type": 20,
+                          "Value": "s2",
+                          "Line": 0,
+                          "LinePos": 0
+                        },
+                        "Type": {
+                          "Type": 21,
+                          "Value": "string",
+                          "Line": 0,
+                          "LinePos": 0
+                        },
+                        "Value": null
+                      }
+                    ],
+                    "Type": {
+                      "Type": 21,
+                      "Value": "string",
+                      "Line": 0,
+                      "LinePos": 0
+                    }
+                  }
+                },
+                {
+                  "Node": null
+                },
+                {
+                  "Node": {
+                    "Name": {
+                      "Type": 20,
+                      "Value": "print",
+                      "Line": 9,
+                      "LinePos": 13
+                    },
+                    "Arguments": [
+                      {
+                        "Type": 19,
+                        "Value": "Ano",
+                        "Line": 9,
+                        "LinePos": 19
+                      }
+                    ]
+                  }
+                },
+                {
+                  "Node": null
+                },
+                {
+                  "Node": null
+                }
+              ],
+              "Alternative": [
+                {
+                  "Node": {
+                    "Name": {
+                      "Type": 21,
+                      "Value": "print",
+                      "Line": 0,
+                      "LinePos": 0
+                    },
+                    "Arguments": [
+                      {
+                        "Name": {
+                          "Type": 20,
+                          "Value": "s",
+                          "Line": 0,
+                          "LinePos": 0
+                        },
+                        "Type": {
+                          "Type": 21,
+                          "Value": "string",
+                          "Line": 0,
+                          "LinePos": 0
+                        },
+                        "Value": null
+                      }
+                    ],
+                    "Type": {
+                      "Type": 21,
+                      "Value": "void",
+                      "Line": 0,
+                      "LinePos": 0
+                    }
+                  }
+                },
+                {
+                  "Node": {
+                    "Name": {
+                      "Type": 21,
+                      "Value": "append",
+                      "Line": 0,
+                      "LinePos": 0
+                    },
+                    "Arguments": [
+                      {
+                        "Name": {
+                          "Type": 20,
+                          "Value": "s1",
+                          "Line": 0,
+                          "LinePos": 0
+                        },
+                        "Type": {
+                          "Type": 21,
+                          "Value": "string",
+                          "Line": 0,
+                          "LinePos": 0
+                        },
+                        "Value": null
+                      },
+                      {
+                        "Name": {
+                          "Type": 20,
+                          "Value": "s2",
+                          "Line": 0,
+                          "LinePos": 0
+                        },
+                        "Type": {
+                          "Type": 21,
+                          "Value": "string",
+                          "Line": 0,
+                          "LinePos": 0
+                        },
+                        "Value": null
+                      }
+                    ],
+                    "Type": {
+                      "Type": 21,
+                      "Value": "string",
+                      "Line": 0,
+                      "LinePos": 0
+                    }
+                  }
+                },
+                {
+                  "Node": null
+                },
+                {
+                  "Node": {
+                    "Name": {
+                      "Type": 20,
+                      "Value": "print",
+                      "Line": 11,
+                      "LinePos": 13
+                    },
+                    "Arguments": [
+                      {
+                        "Type": 19,
+                        "Value": "Ne",
+                        "Line": 11,
+                        "LinePos": 18
+                      }
+                    ]
+                  }
+                },
+                {
+                  "Node": null
+                },
+                {
+                  "Node": null
+                }
+              ]
+            }
+          },
+          {
+            "Node": {
+              "Condition": {
+                "Condition1": {
+                  "Type": 18,
+                  "Value": 5,
+                  "Line": 13,
+                  "LinePos": 8
+                },
+                "Operator": {
+                  "Type": 22,
+                  "Value": "==",
+                  "Line": 13,
+                  "LinePos": 9
+                },
+                "Condition2": {
+                  "Type": 18,
+                  "Value": 5,
+                  "Line": 13,
+                  "LinePos": 11
+                }
+              },
+              "Consequence": [
+                {
+                  "Node": {
+                    "Name": {
+                      "Type": 21,
+                      "Value": "print",
+                      "Line": 0,
+                      "LinePos": 0
+                    },
+                    "Arguments": [
+                      {
+                        "Name": {
+                          "Type": 20,
+                          "Value": "s",
+                          "Line": 0,
+                          "LinePos": 0
+                        },
+                        "Type": {
+                          "Type": 21,
+                          "Value": "string",
+                          "Line": 0,
+                          "LinePos": 0
+                        },
+                        "Value": null
+                      }
+                    ],
+                    "Type": {
+                      "Type": 21,
+                      "Value": "void",
+                      "Line": 0,
+                      "LinePos": 0
+                    }
+                  }
+                },
+                {
+                  "Node": {
+                    "Name": {
+                      "Type": 21,
+                      "Value": "append",
+                      "Line": 0,
+                      "LinePos": 0
+                    },
+                    "Arguments": [
+                      {
+                        "Name": {
+                          "Type": 20,
+                          "Value": "s1",
+                          "Line": 0,
+                          "LinePos": 0
+                        },
+                        "Type": {
+                          "Type": 21,
+                          "Value": "string",
+                          "Line": 0,
+                          "LinePos": 0
+                        },
+                        "Value": null
+                      },
+                      {
+                        "Name": {
+                          "Type": 20,
+                          "Value": "s2",
+                          "Line": 0,
+                          "LinePos": 0
+                        },
+                        "Type": {
+                          "Type": 21,
+                          "Value": "string",
+                          "Line": 0,
+                          "LinePos": 0
+                        },
+                        "Value": null
+                      }
+                    ],
+                    "Type": {
+                      "Type": 21,
+                      "Value": "string",
+                      "Line": 0,
+                      "LinePos": 0
+                    }
+                  }
+                },
+                {
+                  "Node": null
+                },
+                {
+                  "Node": {
+                    "Name": {
+                      "Type": 20,
+                      "Value": "print",
+                      "Line": 14,
+                      "LinePos": 13
+                    },
+                    "Arguments": [
+                      {
+                        "Type": 19,
+                        "Value": "Ahoj",
+                        "Line": 14,
+                        "LinePos": 20
+                      }
+                    ]
+                  }
+                },
+                {
+                  "Node": null
+                },
+                {
+                  "Node": null
+                }
+              ],
+              "Alternative": []
+            }
           },
           {
             "Node": null

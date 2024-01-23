@@ -18,9 +18,14 @@ type ExpressionStatement struct {
 	Right    any
 }
 type IfStatement struct {
-	Condition   []lexer.Token
+	Condition   BoolStatement
 	Consequence []Statement
 	Alternative []Statement
+}
+type BoolStatement struct {
+	Condition1 any
+	Operator   lexer.Token
+	Condition2 any
 }
 type WhileStatement struct {
 	Condition   []lexer.Token
@@ -31,6 +36,11 @@ type FuncDeclaration struct {
 	Arguments []any
 	Type      lexer.Token
 	Body      []Statement
+}
+type ExternFuncDeclaration struct {
+	Name      lexer.Token
+	Arguments []any
+	Type      lexer.Token
 }
 type ReturnStatement struct {
 	Value any
