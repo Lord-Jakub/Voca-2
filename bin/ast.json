@@ -1,4 +1,7 @@
 {
+  "Externals": [
+    "std"
+  ],
   "Statements": [
     {
       "Node": {
