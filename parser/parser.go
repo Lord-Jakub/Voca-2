@@ -13,7 +13,19 @@ func New(tokens []lexer.Token) (ast.Program, error) {
 	Functions, err = MapFunctions(tokens)
 	steatments, err := Parse(tokens, make(map[string]string))
 
-	return ast.Program{Statements: steatments}, err
+	return ast.Program{Statements: steatments, Externals: ParseExternals(tokens)}, err
+}
+
+func ParseExternals(tokens []lexer.Token) []string {
+	var externals []string
+	externals = append(externals, "vsl")
+	for i := 0; i < len(tokens); i++ {
+		if tokens[i].Type == lexer.Keyword && tokens[i].Value == "external" {
+			externals = append(externals, tokens[i+1].Value.(string))
+		}
+	}
+
+	return externals
 }
 
 var Functions = make(map[string]string)

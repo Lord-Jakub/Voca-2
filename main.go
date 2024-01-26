@@ -93,7 +93,7 @@ func os_var(program compiler.Program, i int) (compiler.Program, int) {
 	return program, i
 }
 func main() {
-	program := compiler.Program{Args: os.Args, GenerateAST: false, File: "main.voc", LoadAST: false, Ir: false}
+	program := compiler.Program{Args: os.Args, GenerateAST: false, File: "main.voc", LoadAST: false, Ir: false, Obj: false}
 	if len(program.Args) >= 1 {
 		i := 0
 		for i < len(program.Args) {
@@ -122,6 +122,8 @@ func main() {
 				program.LoadAST = true
 			case "-ir":
 				program.Ir = true
+			case "-obj":
+				program.Obj = true
 
 			}
 			i++

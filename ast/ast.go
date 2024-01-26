@@ -5,6 +5,7 @@ import (
 )
 
 type Program struct {
+	Externals  []string
 	Statements []Statement
 }
 

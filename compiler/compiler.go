@@ -3,9 +3,14 @@ package compiler
 import (
 	"Voca-2/ast"
 	"Voca-2/lexer"
+	"fmt"
 	"os"
+	"path/filepath"
 
 	"strconv"
+
+	"os/exec"
+	"runtime"
 
 	"github.com/llir/llvm/ir"
 	"github.com/llir/llvm/ir/constant"
@@ -44,20 +49,118 @@ type Program struct {
 	OS          string
 	LoadAST     bool
 	Ir          bool
+	Obj         bool
 }
 
 func New(program Program) []error {
-	tmp, err := os.Create(program.File + ".ll")
+	tmp, err := os.Create(program.File[:len(program.File)-4] + ".ll")
 	program.Errs = append(program.Errs, err)
 	_, err = tmp.Write([]byte(GenerateIR(program.Program)))
 
 	program.Errs = append(program.Errs, err)
 	tmp.Close()
+
+	if program.OS == "" {
+		program.OS = runtime.GOOS
+	}
+	if program.Arch == "" {
+		program.Arch = runtime.GOARCH
+	}
+	if program.Arch == "amd64" {
+		program.Arch = "x86_64"
+	}
+	program.Errs = append(program.Errs, CompileToObj(program))
+	program.Errs = append(program.Errs, CompileToExecutable(program))
+	if !program.Obj {
+		if program.OS == "windows" {
+			err = os.Remove(program.File[:len(program.File)-4] + ".obj")
+			program.Errs = append(program.Errs, err)
+		} else if program.OS == "linux" {
+			err = os.Remove(program.File[:len(program.File)-4] + ".o")
+			program.Errs = append(program.Errs, err)
+		}
+	}
+
 	if !program.Ir {
-		err = os.Remove(program.File + ".ll")
+		err = os.Remove(program.File[:len(program.File)-4] + ".ll")
 		program.Errs = append(program.Errs, err)
 	}
 	return program.Errs
+}
+func CompileToObj(program Program) error {
+	var cmd *exec.Cmd
+	var llc string
+	exePath, err := os.Executable()
+	program.Errs = append(program.Errs, err)
+	exeDir := filepath.Dir(exePath)
+	if runtime.GOOS == "windows" {
+		llc = filepath.Join(exeDir, "ll", "llc.exe")
+	} else if runtime.GOOS == "linux" {
+		llc = "llc"
+	}
+
+	if program.OS == "windows" {
+
+		cmd = exec.Command(llc, "-mtriple="+program.Arch+"-pc-"+program.OS+"-msvc", "-filetype=obj", program.File[:len(program.File)-4]+".ll", "-o", program.File[:len(program.File)-4]+".obj")
+	} else if program.OS == "linux" {
+		cmd = exec.Command(llc, "-mtriple="+program.Arch+"-pc-"+program.OS+"-gnu", "-filetype=obj", program.File[:len(program.File)-4]+".ll", "-o", program.File[:len(program.File)-4]+".o")
+	}
+
+	return cmd.Run()
+
+}
+func CompileToExecutable(program Program) error {
+	var cmd *exec.Cmd
+	var lld string
+	exePath, err := os.Executable()
+	program.Errs = append(program.Errs, err)
+	libs := filepath.Join(filepath.Dir(exePath), "libs")
+	exeDir := filepath.Dir(exePath)
+	if runtime.GOOS == "windows" {
+		lld = filepath.Join(exeDir, "ll", "lld-link.exe")
+	} else if runtime.GOOS == "linux" {
+		lld = "clang"
+	}
+
+	if program.Arch == "x86_64" {
+		if program.OS == "windows" {
+			i := 0
+			var libsObjs []string
+			libsObjs = append(libsObjs, "/defaultlib:libc.lib /out:"+program.Output)
+			libsObjs = append(libsObjs, program.File[:len(program.File)-4]+".obj")
+
+			for i < len(program.Program.Externals) {
+				libsObjs = append(libsObjs, filepath.Join(libs, program.Program.Externals[i], program.Program.Externals[i]+"_amd64-windows.obj"))
+				i++
+			}
+
+			cmd = exec.Command(lld, libsObjs...)
+		} else if program.OS == "linux" {
+			i := 0
+			var libsObjs []string
+			libsObjs = append(libsObjs, program.File[:len(program.File)-4]+".o")
+			for i < len(program.Program.Externals) {
+				libsObjs = append(libsObjs, filepath.Join(libs, program.Program.Externals[i], program.Program.Externals[i]+"_amd64-linux.o"))
+				i++
+			}
+			libsObjs = append(libsObjs, "-o", program.Output)
+			cmd = exec.Command(lld, libsObjs...)
+		}
+	} else if program.Arch == "arm64" {
+		i := 0
+		var libsObjs []string
+		libsObjs = append(libsObjs, program.File[:len(program.File)-4]+".o")
+		for i < len(program.Program.Externals) {
+			libsObjs = append(libsObjs, filepath.Join(libs, program.Program.Externals[i], program.Program.Externals[i]+"_arm64-linux.o"))
+			i++
+		}
+		libsObjs = append(libsObjs, "-o", program.Output)
+		cmd = exec.Command(lld, libsObjs...)
+
+	}
+	fmt.Println(cmd.Args)
+	return cmd.Run()
+
 }
 func GenerateIR(program ast.Program) string {
 
