@@ -50,6 +50,7 @@ type Program struct {
 	LoadAST     bool
 	Ir          bool
 	Obj         bool
+	Exec        bool
 }
 
 func New(program Program) []error {
@@ -70,7 +71,9 @@ func New(program Program) []error {
 		program.Arch = "x86_64"
 	}
 	program.Errs = append(program.Errs, CompileToObj(program))
-	program.Errs = append(program.Errs, CompileToExecutable(program))
+	if program.Exec {
+		program.Errs = append(program.Errs, CompileToExecutable(program))
+	}
 	if !program.Obj {
 		if program.OS == "windows" {
 			err = os.Remove(program.File[:len(program.File)-4] + ".obj")
@@ -101,11 +104,11 @@ func CompileToObj(program Program) error {
 
 	if program.OS == "windows" {
 
-		cmd = exec.Command(llc, "-mtriple="+program.Arch+"-pc-"+program.OS+"-msvc", "-filetype=obj", program.File[:len(program.File)-4]+".ll", "-o", program.File[:len(program.File)-4]+".obj")
+		cmd = exec.Command(llc, "-mtriple="+program.Arch+"-w64-"+program.OS+"-mingw32-gcc", "-O2", "-filetype=obj", program.File[:len(program.File)-4]+".ll", "-o", program.File[:len(program.File)-4]+".obj")
 	} else if program.OS == "linux" {
-		cmd = exec.Command(llc, "-mtriple="+program.Arch+"-pc-"+program.OS+"-gnu", "-filetype=obj", program.File[:len(program.File)-4]+".ll", "-o", program.File[:len(program.File)-4]+".o")
+		cmd = exec.Command(llc, "-mtriple="+program.Arch+"-pc-"+program.OS+"-gnu", "-O2", "-filetype=obj", program.File[:len(program.File)-4]+".ll", "-o", program.File[:len(program.File)-4]+".o")
 	}
-
+	fmt.Println(cmd.Args)
 	return cmd.Run()
 
 }
@@ -115,25 +118,19 @@ func CompileToExecutable(program Program) error {
 	exePath, err := os.Executable()
 	program.Errs = append(program.Errs, err)
 	libs := filepath.Join(filepath.Dir(exePath), "libs")
-	exeDir := filepath.Dir(exePath)
-	if runtime.GOOS == "windows" {
-		lld = filepath.Join(exeDir, "ll", "lld-link.exe")
-	} else if runtime.GOOS == "linux" {
-		lld = "clang"
-	}
+	//exeDir := filepath.Dir(exePath)
+	lld = "clang"
 
 	if program.Arch == "x86_64" {
 		if program.OS == "windows" {
 			i := 0
 			var libsObjs []string
-			libsObjs = append(libsObjs, "/defaultlib:libc.lib /out:"+program.Output)
 			libsObjs = append(libsObjs, program.File[:len(program.File)-4]+".obj")
-
 			for i < len(program.Program.Externals) {
 				libsObjs = append(libsObjs, filepath.Join(libs, program.Program.Externals[i], program.Program.Externals[i]+"_amd64-windows.obj"))
 				i++
 			}
-
+			libsObjs = append(libsObjs, "-o", program.Output, "-lgcc")
 			cmd = exec.Command(lld, libsObjs...)
 		} else if program.OS == "linux" {
 			i := 0
@@ -144,7 +141,8 @@ func CompileToExecutable(program Program) error {
 				i++
 			}
 			libsObjs = append(libsObjs, "-o", program.Output)
-			cmd = exec.Command(lld, libsObjs...)
+
+			cmd = exec.Command("gcc", libsObjs...)
 		}
 	} else if program.Arch == "arm64" {
 		i := 0
