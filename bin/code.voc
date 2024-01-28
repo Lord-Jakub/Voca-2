@@ -1,6 +1,11 @@
 
 func main(){
     int i = 5+5*3+5
+    while i>0{
+        print(IntToString(i))
+        i--
+    }
+    bool b = true
     string s = "Ahoj"
     string s2 = " Svete"
     string s3 = s+s2
@@ -12,5 +17,10 @@ func main(){
     }
     if 5==5{
         print("Ahoj")
+    }
+    if !b{
+        print("false")
+    } else {
+        print("true")
     }
 }

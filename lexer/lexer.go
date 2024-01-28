@@ -60,7 +60,7 @@ var symbolMap = map[byte]TokenType{
 	'>':  MoreThan,
 	';':  NewLine,
 }
-var KeyWords = []string{"if", "else", "while", "func", "return", "import", "string", "int", "float", "bool", "void", "extern_func"}
+var KeyWords = []string{"if", "else", "while", "func", "return", "import", "string", "int", "float", "bool", "void", "extern_func", "true", "false"}
 
 func Lex(input string) ([]Token, error) {
 
@@ -74,7 +74,7 @@ func Lex(input string) ([]Token, error) {
 		case unicode.IsLetter(rune(input[pos])) && !(string(input[pos]) == " ") && !(string(input[pos]) == "\"") && !(string(input[pos]) == "'"):
 			//Strings
 			var s string
-			for pos < len(input) && (unicode.IsLetter(rune(input[pos])) || unicode.IsDigit(rune(input[pos])) || (string(input[pos]) == ".") || (string(input[pos]) == "_") || (string(input[pos]) == "-")) && !(string(input[pos]) == " ") && !(string(input[pos]) == "\"") && !(string(input[pos]) == "'") {
+			for pos < len(input) && (unicode.IsLetter(rune(input[pos])) || unicode.IsDigit(rune(input[pos])) || (string(input[pos]) == ".") || (string(input[pos]) == "_")) && !(string(input[pos]) == " ") && !(string(input[pos]) == "\"") && !(string(input[pos]) == "'") {
 				s += string(input[pos])
 				pos++
 				linePos++

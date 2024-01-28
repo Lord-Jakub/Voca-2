@@ -24,12 +24,16 @@ type IfStatement struct {
 	Alternative []Statement
 }
 type BoolStatement struct {
+	Invert bool
+	Bool   any
+}
+type BoolExpression struct {
 	Condition1 any
 	Operator   lexer.Token
 	Condition2 any
 }
 type WhileStatement struct {
-	Condition   []lexer.Token
+	Condition   BoolStatement
 	Consequence []Statement
 }
 type FuncDeclaration struct {
