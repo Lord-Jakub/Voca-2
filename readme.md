@@ -1,4 +1,4 @@
- #Voca 2.0
+ # Voca 2.0
  Second version of my language, this time static typed and compiled.
 **Installation:**
 
