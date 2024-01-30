@@ -43,6 +43,12 @@ func MapFunctions(tokens []lexer.Token) (map[string]string, error) {
 				i++
 			}
 			functions[name.(string)] = tokens[i-1].Value.(string)
+		} else if tokens[i].Type == lexer.Keyword && tokens[i].Value == "extern_func" {
+			name := tokens[i+1].Value
+			for tokens[i].Type != lexer.OpenBrace {
+				i++
+			}
+			functions[name.(string)] = tokens[i-1].Value.(string)
 		}
 	}
 	return functions, nil
@@ -83,7 +89,7 @@ func Parse(tokens []lexer.Token, Variables map[string]string) ([]ast.Statement, 
 					variableDeclaration.Value = value
 
 					if !IsNum {
-						err = errors.New(fmt.Sprintf("Expected number on line: %d at position %d, not '%s'", expression[0].Line, expression[0].LinePos, expression[0].Value))
+						err = errors.New(fmt.Sprintf("Expected number on line: %d at position %d, not '%s' in file '%s'", expression[0].Line, expression[0].LinePos, expression[0].Value, expression[0].File))
 						return program.Statements, err
 					}
 				}
@@ -111,7 +117,7 @@ func Parse(tokens []lexer.Token, Variables map[string]string) ([]ast.Statement, 
 					}
 					variableDeclaration.Value = value
 					if IsNum {
-						err = errors.New(fmt.Sprintf("Expected number on line: %d at position %d, not '%s'", expression[0].Line, expression[0].LinePos, expression[0].Value))
+						err = errors.New(fmt.Sprintf("Expected number on line: %d at position %d, not '%s' in file '%s'", expression[0].Line, expression[0].LinePos, expression[0].Value, expression[0].File))
 						return program.Statements, err
 					}
 				}
@@ -140,7 +146,7 @@ func Parse(tokens []lexer.Token, Variables map[string]string) ([]ast.Statement, 
 							i++
 							arg = ast.VariableDeclaration{Type: tokens[i-1], Name: tokens[i]}
 						} else {
-							err = errors.New(fmt.Sprintf("Expected type on line: %d at position %d, not '%s'", tokens[i].Line, tokens[i].LinePos, tokens[i].Value))
+							err = errors.New(fmt.Sprintf("Expected type on line: %d at position %d, not '%s'in file '%s'", tokens[i].Line, tokens[i].LinePos, tokens[i].Value, tokens[i].File))
 							return program.Statements, err
 						}
 						funcDeclaration.Arguments = append(funcDeclaration.Arguments, arg)
@@ -148,7 +154,7 @@ func Parse(tokens []lexer.Token, Variables map[string]string) ([]ast.Statement, 
 
 					} else {
 
-						err = errors.New(fmt.Sprintf("Expected argument on line: %d at position %d, not '%s'", tokens[i].Line, tokens[i].LinePos, tokens[i].Value))
+						err = errors.New(fmt.Sprintf("Expected argument on line: %d at position %d, not '%s'in file '%s'", tokens[i].Line, tokens[i].LinePos, tokens[i].Value, tokens[i].File))
 						return program.Statements, err
 					}
 
@@ -164,7 +170,7 @@ func Parse(tokens []lexer.Token, Variables map[string]string) ([]ast.Statement, 
 				} else if tokens[i].Type == lexer.OpenBrace {
 					funcDeclaration.Type = lexer.Token{Type: lexer.Keyword, Value: "void"}
 				} else {
-					err = errors.New(fmt.Sprintf("Expected type or { on line: %d at position %d, not '%s'", tokens[i].Line, tokens[i].LinePos, tokens[i].Value))
+					err = errors.New(fmt.Sprintf("Expected type or { on line: %d at position %d, not '%s'in file '%s'", tokens[i].Line, tokens[i].LinePos, tokens[i].Value, tokens[i].File))
 					return program.Statements, err
 				}
 
@@ -199,7 +205,7 @@ func Parse(tokens []lexer.Token, Variables map[string]string) ([]ast.Statement, 
 							i++
 							arg = ast.VariableDeclaration{Type: tokens[i-1], Name: tokens[i]}
 						} else {
-							err = errors.New(fmt.Sprintf("Expected type on line: %d at position %d, not '%s'", tokens[i].Line, tokens[i].LinePos, tokens[i].Value))
+							err = errors.New(fmt.Sprintf("Expected type on line: %d at position %d, not '%s' in file '%s'", tokens[i].Line, tokens[i].LinePos, tokens[i].Value, tokens[i].File))
 							return program.Statements, err
 						}
 						funcDeclaration.Arguments = append(funcDeclaration.Arguments, arg)
@@ -207,7 +213,7 @@ func Parse(tokens []lexer.Token, Variables map[string]string) ([]ast.Statement, 
 
 					} else {
 
-						err = errors.New(fmt.Sprintf("Expected argument on line: %d at position %d, not '%s'", tokens[i].Line, tokens[i].LinePos, tokens[i].Value))
+						err = errors.New(fmt.Sprintf("Expected argument on line: %d at position %d, not '%s'in file '%s'", tokens[i].Line, tokens[i].LinePos, tokens[i].Value, tokens[i].File))
 						return program.Statements, err
 					}
 
@@ -223,7 +229,7 @@ func Parse(tokens []lexer.Token, Variables map[string]string) ([]ast.Statement, 
 				} else if tokens[i].Type == lexer.NewLine {
 					funcDeclaration.Type = lexer.Token{Type: lexer.Keyword, Value: "void"}
 				} else {
-					err = errors.New(fmt.Sprintf("Expected type or { on line: %d at position %d, not '%s'", tokens[i].Line, tokens[i].LinePos, tokens[i].Value))
+					err = errors.New(fmt.Sprintf("Expected type or { on line: %d at position %d, not '%s'in file '%s'", tokens[i].Line, tokens[i].LinePos, tokens[i].Value, tokens[i].File))
 					return program.Statements, err
 				}
 
@@ -269,7 +275,7 @@ func Parse(tokens []lexer.Token, Variables map[string]string) ([]ast.Statement, 
 					if Variables[tokens[i2].Value.(string)] == "bool" {
 						condition = tokens[i2]
 					} else {
-						err = errors.New(fmt.Sprintf("Expected bool on line: %d at position %d, not '%s'", tokens[i2].Line, tokens[i2].LinePos, tokens[i2].Value))
+						err = errors.New(fmt.Sprintf("Expected bool on line: %d at position %d, not '%s' in file: '%s'", tokens[i2].Line, tokens[i2].LinePos, tokens[i2].Value, tokens[i2].File))
 					}
 				} else if tokens[i2].Value == "true" || tokens[i2].Value == "false" {
 					condition = tokens[i2]
@@ -341,7 +347,7 @@ func Parse(tokens []lexer.Token, Variables map[string]string) ([]ast.Statement, 
 					if Variables[tokens[i2].Value.(string)] == "bool" {
 						condition = tokens[i2]
 					} else {
-						err = errors.New(fmt.Sprintf("Expected bool on line: %d at position %d, not '%s'", tokens[i2].Line, tokens[i2].LinePos, tokens[i2].Value))
+						err = errors.New(fmt.Sprintf("Expected bool on line: %d at position %d, not '%s' in file: '%s'", tokens[i2].Line, tokens[i2].LinePos, tokens[i2].Value, tokens[i2].File))
 					}
 				} else if tokens[i2].Value == "true" || tokens[i2].Value == "false" {
 					condition = tokens[i2]
@@ -380,12 +386,11 @@ func Parse(tokens []lexer.Token, Variables map[string]string) ([]ast.Statement, 
 					funcCall.Name = tokens[i]
 					funcCall.Arguments = make([]any, 0)
 					i += 2
-					for tokens[i].Type != lexer.CloseParen {
+					for tokens[i].Type != lexer.CloseParen && tokens[i].Type != lexer.NewLine {
 						var expression []lexer.Token
-						for tokens[i].Type != lexer.Comma && tokens[i].Type != lexer.CloseParen {
-							expression = append(expression, tokens[i])
-							i++
-						}
+
+						expression, i = getArgs(tokens, i, Variables, false)
+
 						if tokens[i].Type == lexer.Comma {
 							i++
 						}
@@ -401,7 +406,7 @@ func Parse(tokens []lexer.Token, Variables map[string]string) ([]ast.Statement, 
 					}
 					statement.Node = funcCall
 				} else {
-					err = errors.New(fmt.Sprintf("Function '%s' not declered on line: %d at position %d", tokens[i].Value, tokens[i].Line, tokens[i].LinePos))
+					err = errors.New(fmt.Sprintf("Function '%s' not declered on line: %d at position %d in file: '%s'", tokens[i].Value, tokens[i].Line, tokens[i].LinePos, tokens[i].File))
 					return program.Statements, err
 				}
 			} else {
@@ -446,12 +451,12 @@ func Parse(tokens []lexer.Token, Variables map[string]string) ([]ast.Statement, 
 						variableAssignment.Value = value
 						if IsNum {
 							if Variables[variableAssignment.Name.Value.(string)] != "int" {
-								err = errors.New(fmt.Sprintf("Expected string on line: %d at position %d, not '%s'", expression[0].Line, expression[0].LinePos, expression[0].Value))
+								err = errors.New(fmt.Sprintf("Expected string on line: %d at position %d, not '%s' in file '%s'", expression[0].Line, expression[0].LinePos, expression[0].Value, expression[0].File))
 								return program.Statements, err
 							}
 						} else {
 							if Variables[variableAssignment.Name.Value.(string)] != "string" {
-								err = errors.New(fmt.Sprintf("Expected number on line: %d at position %d, not '%s'", expression[0].Line, expression[0].LinePos, expression[0].Value))
+								err = errors.New(fmt.Sprintf("Expected number on line: %d at position %d, not '%s' in file '%s'", expression[0].Line, expression[0].LinePos, expression[0].Value, expression[0].File))
 								return program.Statements, err
 							}
 						}
@@ -462,7 +467,7 @@ func Parse(tokens []lexer.Token, Variables map[string]string) ([]ast.Statement, 
 					}
 					statement.Node = variableAssignment
 				} else {
-					err = errors.New(fmt.Sprintf("Variable '%s' not declered on line: %d at position %d", tokens[i].Value, tokens[i].Line, tokens[i].LinePos))
+					err = errors.New(fmt.Sprintf("Variable '%s' not declered on line: %d at position %d in file: '%s'", tokens[i].Value, tokens[i].Line, tokens[i].LinePos, tokens[i].File))
 					return program.Statements, err
 				}
 			}
@@ -470,6 +475,42 @@ func Parse(tokens []lexer.Token, Variables map[string]string) ([]ast.Statement, 
 		program.Statements = append(program.Statements, statement)
 	}
 	return program.Statements, err
+}
+func getArgs(tokens []lexer.Token, i int, Variables map[string]string, funct bool) ([]lexer.Token, int) {
+
+	var expression []lexer.Token
+	for tokens[i].Type != lexer.CloseParen && tokens[i].Type != lexer.NewLine {
+		if !funct && tokens[i].Type == lexer.Comma {
+			break
+		}
+		switch tokens[i].Value.(type) {
+		case string:
+			if _, exist := Functions[tokens[i].Value.(string)]; exist {
+				expression = append(expression, tokens[i])
+				i++
+				expression = append(expression, tokens[i])
+				i++
+				var args []lexer.Token
+				args, i = getArgs(tokens, i, Variables, true)
+				expression = append(expression, args...)
+				i++
+				expression = append(expression, tokens[i])
+
+			} else {
+				expression = append(expression, tokens[i])
+			}
+		default:
+			expression = append(expression, tokens[i])
+		}
+		if tokens[i].Type == lexer.CloseParen {
+
+			break
+		}
+		if i+1 < len(tokens) {
+			i++
+		}
+	}
+	return expression, i
 }
 func ParseBool(tokens []lexer.Token, Variables map[string]string) (ast.BoolExpression, error) {
 	var boolStatement ast.BoolExpression
@@ -545,12 +586,10 @@ func ParseExpression(tokens []lexer.Token, Variables map[string]string) (any, bo
 					funcCall.Name = tokens[0]
 					funcCall.Arguments = make([]any, 0)
 					i += 2
-					for tokens[i].Type != lexer.CloseParen {
+					for tokens[i].Type != lexer.CloseParen && tokens[i].Type != lexer.NewLine {
 						var expression []lexer.Token
-						for tokens[i].Type != lexer.Comma && tokens[i].Type != lexer.CloseParen {
-							expression = append(expression, tokens[i])
-							i++
-						}
+
+						expression, i = getArgs(tokens, i, Variables, false)
 						if tokens[i].Type == lexer.Comma {
 							i++
 						}
@@ -588,12 +627,10 @@ func ParseExpression(tokens []lexer.Token, Variables map[string]string) (any, bo
 					funcCall.Name = tokens[0]
 					funcCall.Arguments = make([]any, 0)
 					i += 2
-					for tokens[i].Type != lexer.CloseParen {
+					for tokens[i].Type != lexer.CloseParen && tokens[i].Type != lexer.NewLine {
 						var expression []lexer.Token
-						for tokens[i].Type != lexer.Comma && tokens[i].Type != lexer.CloseParen {
-							expression = append(expression, tokens[i])
-							i++
-						}
+
+						expression, i = getArgs(tokens, i, Variables, false)
 						if tokens[i].Type == lexer.Comma {
 							i++
 						}
@@ -631,13 +668,12 @@ func ParseExpression(tokens []lexer.Token, Variables map[string]string) (any, bo
 				funcCall.Name = tokens[0]
 				funcCall.Arguments = make([]any, 0)
 				i += 2
-				for (i < len(tokens)) && (tokens[i].Type != lexer.CloseParen) {
+				for tokens[i].Type != lexer.CloseParen && tokens[i].Type != lexer.NewLine {
 					var expression []lexer.Token
-					for (i < len(tokens)) && (tokens[i].Type != lexer.Comma && tokens[i].Type != lexer.CloseParen) {
-						expression = append(expression, tokens[i])
-						i++
-					}
-					if (i < len(tokens)) && (tokens[i].Type == lexer.Comma) {
+
+					expression, i = getArgs(tokens, i, Variables, false)
+
+					if tokens[i].Type == lexer.Comma {
 						i++
 					}
 					arg, _, err := ParseExpression(expression, Variables)
@@ -661,7 +697,7 @@ func ParseExpression(tokens []lexer.Token, Variables map[string]string) (any, bo
 			expressionStatement.Operator = tokens[op]
 			expressionStatement.Right, _, err = ParseExpression(tokens[op+1:], Variables)
 			if expressionStatement.Operator.Type != lexer.Plus {
-				err = errors.New(fmt.Sprintf("Expected '+' on line: %d at position %d, not '%s'", expressionStatement.Operator.Line, expressionStatement.Operator.LinePos, expressionStatement.Operator.Value))
+				err = errors.New(fmt.Sprintf("Expected '+' on line: %d at position %d, not '%s' in file '%s'", expressionStatement.Operator.Line, expressionStatement.Operator.LinePos, expressionStatement.Operator.Value, expressionStatement.Operator.File))
 			}
 		} else {
 			var ret any
@@ -679,10 +715,8 @@ func ParseExpression(tokens []lexer.Token, Variables map[string]string) (any, bo
 				i += 2
 				for tokens[i].Type != lexer.CloseParen {
 					var expression []lexer.Token
-					for tokens[i].Type != lexer.Comma && tokens[i].Type != lexer.CloseParen {
-						expression = append(expression, tokens[i])
-						i++
-					}
+
+					expression, i = getArgs(tokens, i, Variables, false)
 					if tokens[i].Type == lexer.Comma {
 						i++
 					}

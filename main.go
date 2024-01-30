@@ -154,7 +154,7 @@ func main() {
 		}
 		program.Input = string(data)
 		program.Input = strings.Replace(program.Input, "\r", " ", -1)
-		program.Tokens, err = lexer.Lex(program.Input)
+		program.Tokens, err = lexer.Lex(program.Input, program.File)
 		program.Errs = append(program.Errs, err)
 		program.Program, err = parser.New(program.Tokens)
 		program.Errs = append(program.Errs, err)

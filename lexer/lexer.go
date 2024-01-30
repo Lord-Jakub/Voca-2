@@ -4,7 +4,10 @@ import (
 	"Voca-2/lib"
 	"errors"
 	"fmt"
+	"os"
+	"path/filepath"
 	"strconv"
+	"strings"
 	"unicode"
 )
 
@@ -13,6 +16,7 @@ type Token struct {
 	Value   any
 	Line    int
 	LinePos int
+	File    string
 }
 type TokenType int
 
@@ -60,9 +64,71 @@ var symbolMap = map[byte]TokenType{
 	'>':  MoreThan,
 	';':  NewLine,
 }
-var KeyWords = []string{"if", "else", "while", "func", "return", "import", "string", "int", "float", "bool", "void", "extern_func", "true", "false"}
+var KeyWords = []string{"if", "else", "while", "func", "return", "string", "int", "float", "bool", "void", "extern_func", "true", "false", "import"}
 
-func Lex(input string) ([]Token, error) {
+func AddImports(tokens []Token) []Token {
+	for i := 0; i < len(tokens); i++ {
+		if tokens[i].Type == Keyword && tokens[i].Value == "import" {
+			var prevTokens []Token
+			if i != 0 {
+				prevTokens = tokens[:i-1]
+			} else {
+				prevTokens = []Token{}
+			}
+
+			var s string
+			i++
+			file := tokens[i].Value.(string)
+			data, err := os.ReadFile(file + ".voc")
+			if err != nil {
+				exePath, err := os.Executable()
+				if err != nil {
+					fmt.Print("Can't load file: " + err.Error())
+				}
+				lib := filepath.Join(filepath.Dir(exePath), "libs", file, file+".voc")
+				data, err = os.ReadFile(lib)
+				if err != nil {
+					fmt.Print("Can't load file: " + err.Error())
+				}
+
+			}
+			s = string(data)
+			s = strings.Replace(s, "\r", " ", -1)
+			newTokens, err := Lex(s, file+".voc")
+			newTokens = EditImports(newTokens, file)
+			if err != nil {
+				fmt.Print("Lexing error: " + err.Error())
+			}
+			pastTokens := tokens[i+1:]
+			tokens = append(prevTokens, newTokens...)
+			tokens = append(tokens, pastTokens...)
+
+		}
+	}
+	return tokens
+}
+
+func EditImports(tokens []Token, libname string) []Token {
+	functions := []string{}
+	for i := 0; i < len(tokens); i++ {
+		if tokens[i].Type == Keyword && tokens[i].Value == "func" {
+			i++
+			functions = append(functions, tokens[i].Value.(string))
+			tokens[i].Value = libname + "." + tokens[i].Value.(string)
+			i++
+		} else if tokens[i].Type == Identifier {
+			for j := 0; j < len(functions); j++ {
+				if tokens[i].Value == functions[j] {
+					tokens[i].Value = libname + "." + tokens[i].Value.(string)
+				}
+			}
+		}
+
+	}
+	return tokens
+}
+
+func Lex(input string, file string) ([]Token, error) {
 
 	var tokens []Token
 	var err error = nil
@@ -87,13 +153,15 @@ func Lex(input string) ([]Token, error) {
 					Type:    Keyword,
 					Value:   s,
 					Line:    line,
-					LinePos: linePos})
+					LinePos: linePos,
+					File:    file})
 			} else {
 				tokens = append(tokens, Token{
 					Type:    Identifier,
 					Value:   s,
 					Line:    line,
-					LinePos: linePos})
+					LinePos: linePos,
+					File:    file})
 			}
 		case unicode.IsDigit(rune(input[pos])):
 			//Numbers
@@ -117,6 +185,7 @@ func Lex(input string) ([]Token, error) {
 					Value:   number,
 					Line:    line,
 					LinePos: linePos,
+					File:    file,
 				})
 			} else {
 				number, _ := strconv.Atoi(num)
@@ -125,6 +194,7 @@ func Lex(input string) ([]Token, error) {
 					Value:   number,
 					Line:    line,
 					LinePos: linePos,
+					File:    file,
 				})
 			}
 
@@ -146,6 +216,7 @@ func Lex(input string) ([]Token, error) {
 				Value:   s,
 				Line:    line,
 				LinePos: linePos,
+				File:    file,
 			})
 		case string(input[pos]) == "'":
 			//Strings
@@ -165,6 +236,7 @@ func Lex(input string) ([]Token, error) {
 				Value:   s,
 				Line:    line,
 				LinePos: linePos,
+				File:    file,
 			})
 		case string(input[pos]) == "\n":
 			//NewLine
@@ -172,6 +244,7 @@ func Lex(input string) ([]Token, error) {
 				Type:  NewLine,
 				Value: "\n",
 				Line:  line,
+				File:  file,
 			})
 			line++
 			linePos = 0
@@ -182,6 +255,7 @@ func Lex(input string) ([]Token, error) {
 					Value:   "==",
 					Line:    line,
 					LinePos: linePos,
+					File:    file,
 				})
 				pos++
 				linePos++
@@ -192,6 +266,7 @@ func Lex(input string) ([]Token, error) {
 					Value:   "=",
 					Line:    line,
 					LinePos: linePos,
+					File:    file,
 				})
 			}
 		case string(input[pos]) == "!":
@@ -201,6 +276,7 @@ func Lex(input string) ([]Token, error) {
 					Value:   "!=",
 					Line:    line,
 					LinePos: linePos,
+					File:    file,
 				})
 				pos++
 				linePos++
@@ -211,6 +287,7 @@ func Lex(input string) ([]Token, error) {
 					Value:   "!",
 					Line:    line,
 					LinePos: linePos,
+					File:    file,
 				})
 			}
 		case string(input[pos]) == " ":
@@ -239,15 +316,28 @@ func Lex(input string) ([]Token, error) {
 					Value:   string(input[pos]),
 					Line:    line,
 					LinePos: linePos,
+					File:    file,
+				})
+			} else if string(input[pos]) == "\n" {
+				line++
+				linePos = 0
+				tokens = append(tokens, Token{
+					Type:    NewLine,
+					Value:   "\n",
+					Line:    line,
+					LinePos: linePos,
+					File:    file,
 				})
 			} else {
-				err = errors.New(fmt.Sprintf("Invalid symbol: '%c' on line: %d at position: %d", input[pos], line, linePos))
+
+				err = errors.New(fmt.Sprintf("Invalid symbol: '%c' on line: %d at position: %d in file: '%s'", input[pos], line, linePos, file))
 			}
 		}
 		linePos++
 		pos++
 	}
-
+	tokens = AddImports(tokens)
+	//fmt.Println(tokens)
 	return tokens, err
 }
 func IsOperator(token Token) bool {

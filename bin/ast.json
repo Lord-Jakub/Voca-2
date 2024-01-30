@@ -9,7 +9,8 @@
           "Type": 21,
           "Value": "print",
           "Line": 0,
-          "LinePos": 0
+          "LinePos": 0,
+          "File": ""
         },
         "Arguments": [
           {
@@ -17,13 +18,15 @@
               "Type": 20,
               "Value": "s",
               "Line": 0,
-              "LinePos": 0
+              "LinePos": 0,
+              "File": ""
             },
             "Type": {
               "Type": 21,
               "Value": "string",
               "Line": 0,
-              "LinePos": 0
+              "LinePos": 0,
+              "File": ""
             },
             "Value": null
           }
@@ -32,7 +35,8 @@
           "Type": 21,
           "Value": "void",
           "Line": 0,
-          "LinePos": 0
+          "LinePos": 0,
+          "File": ""
         }
       }
     },
@@ -42,7 +46,8 @@
           "Type": 21,
           "Value": "append",
           "Line": 0,
-          "LinePos": 0
+          "LinePos": 0,
+          "File": ""
         },
         "Arguments": [
           {
@@ -50,13 +55,15 @@
               "Type": 20,
               "Value": "s1",
               "Line": 0,
-              "LinePos": 0
+              "LinePos": 0,
+              "File": ""
             },
             "Type": {
               "Type": 21,
               "Value": "string",
               "Line": 0,
-              "LinePos": 0
+              "LinePos": 0,
+              "File": ""
             },
             "Value": null
           },
@@ -65,13 +72,15 @@
               "Type": 20,
               "Value": "s2",
               "Line": 0,
-              "LinePos": 0
+              "LinePos": 0,
+              "File": ""
             },
             "Type": {
               "Type": 21,
               "Value": "string",
               "Line": 0,
-              "LinePos": 0
+              "LinePos": 0,
+              "File": ""
             },
             "Value": null
           }
@@ -80,7 +89,8 @@
           "Type": 21,
           "Value": "string",
           "Line": 0,
-          "LinePos": 0
+          "LinePos": 0,
+          "File": ""
         }
       }
     },
@@ -90,7 +100,8 @@
           "Type": 21,
           "Value": "strlen",
           "Line": 0,
-          "LinePos": 0
+          "LinePos": 0,
+          "File": ""
         },
         "Arguments": [
           {
@@ -98,13 +109,15 @@
               "Type": 20,
               "Value": "s",
               "Line": 0,
-              "LinePos": 0
+              "LinePos": 0,
+              "File": ""
             },
             "Type": {
               "Type": 21,
               "Value": "string",
               "Line": 0,
-              "LinePos": 0
+              "LinePos": 0,
+              "File": ""
             },
             "Value": null
           }
@@ -113,7 +126,8 @@
           "Type": 21,
           "Value": "int",
           "Line": 0,
-          "LinePos": 0
+          "LinePos": 0,
+          "File": ""
         }
       }
     },
@@ -123,7 +137,8 @@
           "Type": 21,
           "Value": "IntToString",
           "Line": 0,
-          "LinePos": 0
+          "LinePos": 0,
+          "File": ""
         },
         "Arguments": [
           {
@@ -131,13 +146,15 @@
               "Type": 20,
               "Value": "num",
               "Line": 0,
-              "LinePos": 0
+              "LinePos": 0,
+              "File": ""
             },
             "Type": {
               "Type": 21,
               "Value": "int",
               "Line": 0,
-              "LinePos": 0
+              "LinePos": 0,
+              "File": ""
             },
             "Value": null
           }
@@ -146,27 +163,62 @@
           "Type": 21,
           "Value": "string",
           "Line": 0,
-          "LinePos": 0
+          "LinePos": 0,
+          "File": ""
         }
       }
-    },
-    {
-      "Node": null
     },
     {
       "Node": {
         "Name": {
           "Type": 20,
-          "Value": "main",
-          "Line": 2,
-          "LinePos": 9
+          "Value": "math.Add",
+          "Line": 1,
+          "LinePos": 7,
+          "File": "math.voc"
         },
-        "Arguments": [],
+        "Arguments": [
+          {
+            "Name": {
+              "Type": 20,
+              "Value": "x",
+              "Line": 1,
+              "LinePos": 13,
+              "File": "math.voc"
+            },
+            "Type": {
+              "Type": 21,
+              "Value": "int",
+              "Line": 1,
+              "LinePos": 11,
+              "File": "math.voc"
+            },
+            "Value": null
+          },
+          {
+            "Name": {
+              "Type": 20,
+              "Value": "y",
+              "Line": 1,
+              "LinePos": 20,
+              "File": "math.voc"
+            },
+            "Type": {
+              "Type": 21,
+              "Value": "int",
+              "Line": 1,
+              "LinePos": 18,
+              "File": "math.voc"
+            },
+            "Value": null
+          }
+        ],
         "Type": {
           "Type": 21,
-          "Value": "void",
-          "Line": 0,
-          "LinePos": 0
+          "Value": "int",
+          "Line": 1,
+          "LinePos": 25,
+          "File": "math.voc"
         },
         "Body": [
           {
@@ -175,7 +227,8 @@
                 "Type": 21,
                 "Value": "print",
                 "Line": 0,
-                "LinePos": 0
+                "LinePos": 0,
+                "File": ""
               },
               "Arguments": [
                 {
@@ -183,13 +236,15 @@
                     "Type": 20,
                     "Value": "s",
                     "Line": 0,
-                    "LinePos": 0
+                    "LinePos": 0,
+                    "File": ""
                   },
                   "Type": {
                     "Type": 21,
                     "Value": "string",
                     "Line": 0,
-                    "LinePos": 0
+                    "LinePos": 0,
+                    "File": ""
                   },
                   "Value": null
                 }
@@ -198,7 +253,8 @@
                 "Type": 21,
                 "Value": "void",
                 "Line": 0,
-                "LinePos": 0
+                "LinePos": 0,
+                "File": ""
               }
             }
           },
@@ -208,7 +264,8 @@
                 "Type": 21,
                 "Value": "append",
                 "Line": 0,
-                "LinePos": 0
+                "LinePos": 0,
+                "File": ""
               },
               "Arguments": [
                 {
@@ -216,13 +273,15 @@
                     "Type": 20,
                     "Value": "s1",
                     "Line": 0,
-                    "LinePos": 0
+                    "LinePos": 0,
+                    "File": ""
                   },
                   "Type": {
                     "Type": 21,
                     "Value": "string",
                     "Line": 0,
-                    "LinePos": 0
+                    "LinePos": 0,
+                    "File": ""
                   },
                   "Value": null
                 },
@@ -231,13 +290,15 @@
                     "Type": 20,
                     "Value": "s2",
                     "Line": 0,
-                    "LinePos": 0
+                    "LinePos": 0,
+                    "File": ""
                   },
                   "Type": {
                     "Type": 21,
                     "Value": "string",
                     "Line": 0,
-                    "LinePos": 0
+                    "LinePos": 0,
+                    "File": ""
                   },
                   "Value": null
                 }
@@ -246,7 +307,8 @@
                 "Type": 21,
                 "Value": "string",
                 "Line": 0,
-                "LinePos": 0
+                "LinePos": 0,
+                "File": ""
               }
             }
           },
@@ -256,7 +318,8 @@
                 "Type": 21,
                 "Value": "strlen",
                 "Line": 0,
-                "LinePos": 0
+                "LinePos": 0,
+                "File": ""
               },
               "Arguments": [
                 {
@@ -264,13 +327,15 @@
                     "Type": 20,
                     "Value": "s",
                     "Line": 0,
-                    "LinePos": 0
+                    "LinePos": 0,
+                    "File": ""
                   },
                   "Type": {
                     "Type": 21,
                     "Value": "string",
                     "Line": 0,
-                    "LinePos": 0
+                    "LinePos": 0,
+                    "File": ""
                   },
                   "Value": null
                 }
@@ -279,7 +344,8 @@
                 "Type": 21,
                 "Value": "int",
                 "Line": 0,
-                "LinePos": 0
+                "LinePos": 0,
+                "File": ""
               }
             }
           },
@@ -289,7 +355,8 @@
                 "Type": 21,
                 "Value": "IntToString",
                 "Line": 0,
-                "LinePos": 0
+                "LinePos": 0,
+                "File": ""
               },
               "Arguments": [
                 {
@@ -297,13 +364,15 @@
                     "Type": 20,
                     "Value": "num",
                     "Line": 0,
-                    "LinePos": 0
+                    "LinePos": 0,
+                    "File": ""
                   },
                   "Type": {
                     "Type": 21,
                     "Value": "int",
                     "Line": 0,
-                    "LinePos": 0
+                    "LinePos": 0,
+                    "File": ""
                   },
                   "Value": null
                 }
@@ -312,7 +381,227 @@
                 "Type": 21,
                 "Value": "string",
                 "Line": 0,
-                "LinePos": 0
+                "LinePos": 0,
+                "File": ""
+              }
+            }
+          },
+          {
+            "Node": null
+          },
+          {
+            "Node": {
+              "Value": {
+                "Left": {
+                  "Type": 20,
+                  "Value": "x",
+                  "Line": 2,
+                  "LinePos": 12,
+                  "File": "math.voc"
+                },
+                "Operator": {
+                  "Type": 5,
+                  "Value": "+",
+                  "Line": 2,
+                  "LinePos": 13,
+                  "File": "math.voc"
+                },
+                "Right": {
+                  "Type": 20,
+                  "Value": "y",
+                  "Line": 2,
+                  "LinePos": 14,
+                  "File": "math.voc"
+                }
+              }
+            }
+          },
+          {
+            "Node": null
+          }
+        ]
+      }
+    },
+    {
+      "Node": {
+        "Name": {
+          "Type": 20,
+          "Value": "main",
+          "Line": 2,
+          "LinePos": 9,
+          "File": "code.voc"
+        },
+        "Arguments": [],
+        "Type": {
+          "Type": 21,
+          "Value": "void",
+          "Line": 0,
+          "LinePos": 0,
+          "File": ""
+        },
+        "Body": [
+          {
+            "Node": {
+              "Name": {
+                "Type": 21,
+                "Value": "print",
+                "Line": 0,
+                "LinePos": 0,
+                "File": ""
+              },
+              "Arguments": [
+                {
+                  "Name": {
+                    "Type": 20,
+                    "Value": "s",
+                    "Line": 0,
+                    "LinePos": 0,
+                    "File": ""
+                  },
+                  "Type": {
+                    "Type": 21,
+                    "Value": "string",
+                    "Line": 0,
+                    "LinePos": 0,
+                    "File": ""
+                  },
+                  "Value": null
+                }
+              ],
+              "Type": {
+                "Type": 21,
+                "Value": "void",
+                "Line": 0,
+                "LinePos": 0,
+                "File": ""
+              }
+            }
+          },
+          {
+            "Node": {
+              "Name": {
+                "Type": 21,
+                "Value": "append",
+                "Line": 0,
+                "LinePos": 0,
+                "File": ""
+              },
+              "Arguments": [
+                {
+                  "Name": {
+                    "Type": 20,
+                    "Value": "s1",
+                    "Line": 0,
+                    "LinePos": 0,
+                    "File": ""
+                  },
+                  "Type": {
+                    "Type": 21,
+                    "Value": "string",
+                    "Line": 0,
+                    "LinePos": 0,
+                    "File": ""
+                  },
+                  "Value": null
+                },
+                {
+                  "Name": {
+                    "Type": 20,
+                    "Value": "s2",
+                    "Line": 0,
+                    "LinePos": 0,
+                    "File": ""
+                  },
+                  "Type": {
+                    "Type": 21,
+                    "Value": "string",
+                    "Line": 0,
+                    "LinePos": 0,
+                    "File": ""
+                  },
+                  "Value": null
+                }
+              ],
+              "Type": {
+                "Type": 21,
+                "Value": "string",
+                "Line": 0,
+                "LinePos": 0,
+                "File": ""
+              }
+            }
+          },
+          {
+            "Node": {
+              "Name": {
+                "Type": 21,
+                "Value": "strlen",
+                "Line": 0,
+                "LinePos": 0,
+                "File": ""
+              },
+              "Arguments": [
+                {
+                  "Name": {
+                    "Type": 20,
+                    "Value": "s",
+                    "Line": 0,
+                    "LinePos": 0,
+                    "File": ""
+                  },
+                  "Type": {
+                    "Type": 21,
+                    "Value": "string",
+                    "Line": 0,
+                    "LinePos": 0,
+                    "File": ""
+                  },
+                  "Value": null
+                }
+              ],
+              "Type": {
+                "Type": 21,
+                "Value": "int",
+                "Line": 0,
+                "LinePos": 0,
+                "File": ""
+              }
+            }
+          },
+          {
+            "Node": {
+              "Name": {
+                "Type": 21,
+                "Value": "IntToString",
+                "Line": 0,
+                "LinePos": 0,
+                "File": ""
+              },
+              "Arguments": [
+                {
+                  "Name": {
+                    "Type": 20,
+                    "Value": "num",
+                    "Line": 0,
+                    "LinePos": 0,
+                    "File": ""
+                  },
+                  "Type": {
+                    "Type": 21,
+                    "Value": "int",
+                    "Line": 0,
+                    "LinePos": 0,
+                    "File": ""
+                  },
+                  "Value": null
+                }
+              ],
+              "Type": {
+                "Type": 21,
+                "Value": "string",
+                "Line": 0,
+                "LinePos": 0,
+                "File": ""
               }
             }
           },
@@ -325,26 +614,30 @@
                 "Type": 20,
                 "Value": "i",
                 "Line": 3,
-                "LinePos": 9
+                "LinePos": 9,
+                "File": "code.voc"
               },
               "Type": {
                 "Type": 21,
                 "Value": "int",
                 "Line": 3,
-                "LinePos": 7
+                "LinePos": 7,
+                "File": "code.voc"
               },
               "Value": {
                 "Left": {
                   "Type": 18,
                   "Value": 5,
                   "Line": 3,
-                  "LinePos": 13
+                  "LinePos": 13,
+                  "File": "code.voc"
                 },
                 "Operator": {
                   "Type": 5,
                   "Value": "+",
                   "Line": 3,
-                  "LinePos": 14
+                  "LinePos": 14,
+                  "File": "code.voc"
                 },
                 "Right": {
                   "Left": {
@@ -352,32 +645,37 @@
                       "Type": 18,
                       "Value": 5,
                       "Line": 3,
-                      "LinePos": 15
+                      "LinePos": 15,
+                      "File": "code.voc"
                     },
                     "Operator": {
                       "Type": 7,
                       "Value": "*",
                       "Line": 3,
-                      "LinePos": 16
+                      "LinePos": 16,
+                      "File": "code.voc"
                     },
                     "Right": {
                       "Type": 18,
                       "Value": 3,
                       "Line": 3,
-                      "LinePos": 17
+                      "LinePos": 17,
+                      "File": "code.voc"
                     }
                   },
                   "Operator": {
                     "Type": 5,
                     "Value": "+",
                     "Line": 3,
-                    "LinePos": 18
+                    "LinePos": 18,
+                    "File": "code.voc"
                   },
                   "Right": {
                     "Type": 18,
                     "Value": 5,
                     "Line": 3,
-                    "LinePos": 19
+                    "LinePos": 19,
+                    "File": "code.voc"
                   }
                 }
               }
@@ -395,19 +693,22 @@
                     "Type": 20,
                     "Value": "i",
                     "Line": 4,
-                    "LinePos": 11
+                    "LinePos": 11,
+                    "File": "code.voc"
                   },
                   "Operator": {
                     "Type": 17,
                     "Value": "\u003e",
                     "Line": 4,
-                    "LinePos": 12
+                    "LinePos": 12,
+                    "File": "code.voc"
                   },
                   "Condition2": {
                     "Type": 18,
                     "Value": 0,
                     "Line": 4,
-                    "LinePos": 13
+                    "LinePos": 13,
+                    "File": "code.voc"
                   }
                 }
               },
@@ -418,7 +719,8 @@
                       "Type": 21,
                       "Value": "print",
                       "Line": 0,
-                      "LinePos": 0
+                      "LinePos": 0,
+                      "File": ""
                     },
                     "Arguments": [
                       {
@@ -426,13 +728,15 @@
                           "Type": 20,
                           "Value": "s",
                           "Line": 0,
-                          "LinePos": 0
+                          "LinePos": 0,
+                          "File": ""
                         },
                         "Type": {
                           "Type": 21,
                           "Value": "string",
                           "Line": 0,
-                          "LinePos": 0
+                          "LinePos": 0,
+                          "File": ""
                         },
                         "Value": null
                       }
@@ -441,7 +745,8 @@
                       "Type": 21,
                       "Value": "void",
                       "Line": 0,
-                      "LinePos": 0
+                      "LinePos": 0,
+                      "File": ""
                     }
                   }
                 },
@@ -451,7 +756,8 @@
                       "Type": 21,
                       "Value": "append",
                       "Line": 0,
-                      "LinePos": 0
+                      "LinePos": 0,
+                      "File": ""
                     },
                     "Arguments": [
                       {
@@ -459,13 +765,15 @@
                           "Type": 20,
                           "Value": "s1",
                           "Line": 0,
-                          "LinePos": 0
+                          "LinePos": 0,
+                          "File": ""
                         },
                         "Type": {
                           "Type": 21,
                           "Value": "string",
                           "Line": 0,
-                          "LinePos": 0
+                          "LinePos": 0,
+                          "File": ""
                         },
                         "Value": null
                       },
@@ -474,13 +782,15 @@
                           "Type": 20,
                           "Value": "s2",
                           "Line": 0,
-                          "LinePos": 0
+                          "LinePos": 0,
+                          "File": ""
                         },
                         "Type": {
                           "Type": 21,
                           "Value": "string",
                           "Line": 0,
-                          "LinePos": 0
+                          "LinePos": 0,
+                          "File": ""
                         },
                         "Value": null
                       }
@@ -489,7 +799,8 @@
                       "Type": 21,
                       "Value": "string",
                       "Line": 0,
-                      "LinePos": 0
+                      "LinePos": 0,
+                      "File": ""
                     }
                   }
                 },
@@ -499,7 +810,8 @@
                       "Type": 21,
                       "Value": "strlen",
                       "Line": 0,
-                      "LinePos": 0
+                      "LinePos": 0,
+                      "File": ""
                     },
                     "Arguments": [
                       {
@@ -507,13 +819,15 @@
                           "Type": 20,
                           "Value": "s",
                           "Line": 0,
-                          "LinePos": 0
+                          "LinePos": 0,
+                          "File": ""
                         },
                         "Type": {
                           "Type": 21,
                           "Value": "string",
                           "Line": 0,
-                          "LinePos": 0
+                          "LinePos": 0,
+                          "File": ""
                         },
                         "Value": null
                       }
@@ -522,7 +836,8 @@
                       "Type": 21,
                       "Value": "int",
                       "Line": 0,
-                      "LinePos": 0
+                      "LinePos": 0,
+                      "File": ""
                     }
                   }
                 },
@@ -532,7 +847,8 @@
                       "Type": 21,
                       "Value": "IntToString",
                       "Line": 0,
-                      "LinePos": 0
+                      "LinePos": 0,
+                      "File": ""
                     },
                     "Arguments": [
                       {
@@ -540,13 +856,15 @@
                           "Type": 20,
                           "Value": "num",
                           "Line": 0,
-                          "LinePos": 0
+                          "LinePos": 0,
+                          "File": ""
                         },
                         "Type": {
                           "Type": 21,
                           "Value": "int",
                           "Line": 0,
-                          "LinePos": 0
+                          "LinePos": 0,
+                          "File": ""
                         },
                         "Value": null
                       }
@@ -555,7 +873,8 @@
                       "Type": 21,
                       "Value": "string",
                       "Line": 0,
-                      "LinePos": 0
+                      "LinePos": 0,
+                      "File": ""
                     }
                   }
                 },
@@ -568,7 +887,8 @@
                       "Type": 20,
                       "Value": "print",
                       "Line": 5,
-                      "LinePos": 13
+                      "LinePos": 13,
+                      "File": "code.voc"
                     },
                     "Arguments": [
                       {
@@ -576,14 +896,16 @@
                           "Type": 20,
                           "Value": "IntToString",
                           "Line": 5,
-                          "LinePos": 25
+                          "LinePos": 25,
+                          "File": "code.voc"
                         },
                         "Arguments": [
                           {
                             "Type": 20,
                             "Value": "i",
                             "Line": 5,
-                            "LinePos": 27
+                            "LinePos": 27,
+                            "File": "code.voc"
                           }
                         ]
                       }
@@ -594,34 +916,35 @@
                   "Node": null
                 },
                 {
-                  "Node": null
-                },
-                {
                   "Node": {
                     "Name": {
                       "Type": 20,
                       "Value": "i",
                       "Line": 6,
-                      "LinePos": 9
+                      "LinePos": 9,
+                      "File": "code.voc"
                     },
                     "Value": {
                       "Left": {
                         "Type": 20,
                         "Value": "i",
                         "Line": 6,
-                        "LinePos": 9
+                        "LinePos": 9,
+                        "File": "code.voc"
                       },
                       "Operator": {
                         "Type": 6,
                         "Value": "-",
                         "Line": 6,
-                        "LinePos": 10
+                        "LinePos": 10,
+                        "File": "code.voc"
                       },
                       "Right": {
                         "Type": 18,
                         "Value": 1,
                         "Line": 0,
-                        "LinePos": 0
+                        "LinePos": 0,
+                        "File": ""
                       }
                     }
                   }
@@ -647,19 +970,22 @@
                 "Type": 20,
                 "Value": "b",
                 "Line": 8,
-                "LinePos": 10
+                "LinePos": 10,
+                "File": "code.voc"
               },
               "Type": {
                 "Type": 21,
                 "Value": "bool",
                 "Line": 8,
-                "LinePos": 8
+                "LinePos": 8,
+                "File": "code.voc"
               },
               "Value": {
                 "Type": 21,
                 "Value": "true",
                 "Line": 8,
-                "LinePos": 17
+                "LinePos": 17,
+                "File": "code.voc"
               }
             }
           },
@@ -672,19 +998,22 @@
                 "Type": 20,
                 "Value": "s",
                 "Line": 9,
-                "LinePos": 12
+                "LinePos": 12,
+                "File": "code.voc"
               },
               "Type": {
                 "Type": 21,
                 "Value": "string",
                 "Line": 9,
-                "LinePos": 10
+                "LinePos": 10,
+                "File": "code.voc"
               },
               "Value": {
                 "Type": 19,
                 "Value": "Ahoj",
                 "Line": 9,
-                "LinePos": 21
+                "LinePos": 21,
+                "File": "code.voc"
               }
             }
           },
@@ -697,19 +1026,22 @@
                 "Type": 20,
                 "Value": "s2",
                 "Line": 10,
-                "LinePos": 13
+                "LinePos": 13,
+                "File": "code.voc"
               },
               "Type": {
                 "Type": 21,
                 "Value": "string",
                 "Line": 10,
-                "LinePos": 10
+                "LinePos": 10,
+                "File": "code.voc"
               },
               "Value": {
                 "Type": 19,
                 "Value": " Svete",
                 "Line": 10,
-                "LinePos": 24
+                "LinePos": 24,
+                "File": "code.voc"
               }
             }
           },
@@ -722,32 +1054,37 @@
                 "Type": 20,
                 "Value": "s3",
                 "Line": 11,
-                "LinePos": 13
+                "LinePos": 13,
+                "File": "code.voc"
               },
               "Type": {
                 "Type": 21,
                 "Value": "string",
                 "Line": 11,
-                "LinePos": 10
+                "LinePos": 10,
+                "File": "code.voc"
               },
               "Value": {
                 "Left": {
                   "Type": 20,
                   "Value": "s",
                   "Line": 11,
-                  "LinePos": 17
+                  "LinePos": 17,
+                  "File": "code.voc"
                 },
                 "Operator": {
                   "Type": 5,
                   "Value": "+",
                   "Line": 11,
-                  "LinePos": 18
+                  "LinePos": 18,
+                  "File": "code.voc"
                 },
                 "Right": {
                   "Type": 20,
                   "Value": "s2",
                   "Line": 11,
-                  "LinePos": 20
+                  "LinePos": 20,
+                  "File": "code.voc"
                 }
               }
             }
@@ -761,14 +1098,16 @@
                 "Type": 20,
                 "Value": "print",
                 "Line": 12,
-                "LinePos": 9
+                "LinePos": 9,
+                "File": "code.voc"
               },
               "Arguments": [
                 {
                   "Type": 20,
                   "Value": "s3",
                   "Line": 12,
-                  "LinePos": 12
+                  "LinePos": 12,
+                  "File": "code.voc"
                 }
               ]
             }
@@ -786,32 +1125,37 @@
                       "Type": 18,
                       "Value": 5,
                       "Line": 13,
-                      "LinePos": 7
+                      "LinePos": 7,
+                      "File": "code.voc"
                     },
                     "Operator": {
                       "Type": 5,
                       "Value": "+",
                       "Line": 13,
-                      "LinePos": 8
+                      "LinePos": 8,
+                      "File": "code.voc"
                     },
                     "Right": {
                       "Type": 18,
                       "Value": 5,
                       "Line": 13,
-                      "LinePos": 9
+                      "LinePos": 9,
+                      "File": "code.voc"
                     }
                   },
                   "Operator": {
                     "Type": 16,
                     "Value": "\u003c",
                     "Line": 13,
-                    "LinePos": 11
+                    "LinePos": 11,
+                    "File": "code.voc"
                   },
                   "Condition2": {
                     "Type": 18,
                     "Value": 11,
                     "Line": 13,
-                    "LinePos": 14
+                    "LinePos": 14,
+                    "File": "code.voc"
                   }
                 }
               },
@@ -822,7 +1166,8 @@
                       "Type": 21,
                       "Value": "print",
                       "Line": 0,
-                      "LinePos": 0
+                      "LinePos": 0,
+                      "File": ""
                     },
                     "Arguments": [
                       {
@@ -830,13 +1175,15 @@
                           "Type": 20,
                           "Value": "s",
                           "Line": 0,
-                          "LinePos": 0
+                          "LinePos": 0,
+                          "File": ""
                         },
                         "Type": {
                           "Type": 21,
                           "Value": "string",
                           "Line": 0,
-                          "LinePos": 0
+                          "LinePos": 0,
+                          "File": ""
                         },
                         "Value": null
                       }
@@ -845,7 +1192,8 @@
                       "Type": 21,
                       "Value": "void",
                       "Line": 0,
-                      "LinePos": 0
+                      "LinePos": 0,
+                      "File": ""
                     }
                   }
                 },
@@ -855,7 +1203,8 @@
                       "Type": 21,
                       "Value": "append",
                       "Line": 0,
-                      "LinePos": 0
+                      "LinePos": 0,
+                      "File": ""
                     },
                     "Arguments": [
                       {
@@ -863,13 +1212,15 @@
                           "Type": 20,
                           "Value": "s1",
                           "Line": 0,
-                          "LinePos": 0
+                          "LinePos": 0,
+                          "File": ""
                         },
                         "Type": {
                           "Type": 21,
                           "Value": "string",
                           "Line": 0,
-                          "LinePos": 0
+                          "LinePos": 0,
+                          "File": ""
                         },
                         "Value": null
                       },
@@ -878,13 +1229,15 @@
                           "Type": 20,
                           "Value": "s2",
                           "Line": 0,
-                          "LinePos": 0
+                          "LinePos": 0,
+                          "File": ""
                         },
                         "Type": {
                           "Type": 21,
                           "Value": "string",
                           "Line": 0,
-                          "LinePos": 0
+                          "LinePos": 0,
+                          "File": ""
                         },
                         "Value": null
                       }
@@ -893,7 +1246,8 @@
                       "Type": 21,
                       "Value": "string",
                       "Line": 0,
-                      "LinePos": 0
+                      "LinePos": 0,
+                      "File": ""
                     }
                   }
                 },
@@ -903,7 +1257,8 @@
                       "Type": 21,
                       "Value": "strlen",
                       "Line": 0,
-                      "LinePos": 0
+                      "LinePos": 0,
+                      "File": ""
                     },
                     "Arguments": [
                       {
@@ -911,13 +1266,15 @@
                           "Type": 20,
                           "Value": "s",
                           "Line": 0,
-                          "LinePos": 0
+                          "LinePos": 0,
+                          "File": ""
                         },
                         "Type": {
                           "Type": 21,
                           "Value": "string",
                           "Line": 0,
-                          "LinePos": 0
+                          "LinePos": 0,
+                          "File": ""
                         },
                         "Value": null
                       }
@@ -926,7 +1283,8 @@
                       "Type": 21,
                       "Value": "int",
                       "Line": 0,
-                      "LinePos": 0
+                      "LinePos": 0,
+                      "File": ""
                     }
                   }
                 },
@@ -936,7 +1294,8 @@
                       "Type": 21,
                       "Value": "IntToString",
                       "Line": 0,
-                      "LinePos": 0
+                      "LinePos": 0,
+                      "File": ""
                     },
                     "Arguments": [
                       {
@@ -944,13 +1303,15 @@
                           "Type": 20,
                           "Value": "num",
                           "Line": 0,
-                          "LinePos": 0
+                          "LinePos": 0,
+                          "File": ""
                         },
                         "Type": {
                           "Type": 21,
                           "Value": "int",
                           "Line": 0,
-                          "LinePos": 0
+                          "LinePos": 0,
+                          "File": ""
                         },
                         "Value": null
                       }
@@ -959,7 +1320,8 @@
                       "Type": 21,
                       "Value": "string",
                       "Line": 0,
-                      "LinePos": 0
+                      "LinePos": 0,
+                      "File": ""
                     }
                   }
                 },
@@ -972,14 +1334,16 @@
                       "Type": 20,
                       "Value": "print",
                       "Line": 14,
-                      "LinePos": 13
+                      "LinePos": 13,
+                      "File": "code.voc"
                     },
                     "Arguments": [
                       {
                         "Type": 19,
                         "Value": "Ano",
                         "Line": 14,
-                        "LinePos": 19
+                        "LinePos": 19,
+                        "File": "code.voc"
                       }
                     ]
                   }
@@ -998,7 +1362,8 @@
                       "Type": 21,
                       "Value": "print",
                       "Line": 0,
-                      "LinePos": 0
+                      "LinePos": 0,
+                      "File": ""
                     },
                     "Arguments": [
                       {
@@ -1006,13 +1371,15 @@
                           "Type": 20,
                           "Value": "s",
                           "Line": 0,
-                          "LinePos": 0
+                          "LinePos": 0,
+                          "File": ""
                         },
                         "Type": {
                           "Type": 21,
                           "Value": "string",
                           "Line": 0,
-                          "LinePos": 0
+                          "LinePos": 0,
+                          "File": ""
                         },
                         "Value": null
                       }
@@ -1021,7 +1388,8 @@
                       "Type": 21,
                       "Value": "void",
                       "Line": 0,
-                      "LinePos": 0
+                      "LinePos": 0,
+                      "File": ""
                     }
                   }
                 },
@@ -1031,7 +1399,8 @@
                       "Type": 21,
                       "Value": "append",
                       "Line": 0,
-                      "LinePos": 0
+                      "LinePos": 0,
+                      "File": ""
                     },
                     "Arguments": [
                       {
@@ -1039,13 +1408,15 @@
                           "Type": 20,
                           "Value": "s1",
                           "Line": 0,
-                          "LinePos": 0
+                          "LinePos": 0,
+                          "File": ""
                         },
                         "Type": {
                           "Type": 21,
                           "Value": "string",
                           "Line": 0,
-                          "LinePos": 0
+                          "LinePos": 0,
+                          "File": ""
                         },
                         "Value": null
                       },
@@ -1054,13 +1425,15 @@
                           "Type": 20,
                           "Value": "s2",
                           "Line": 0,
-                          "LinePos": 0
+                          "LinePos": 0,
+                          "File": ""
                         },
                         "Type": {
                           "Type": 21,
                           "Value": "string",
                           "Line": 0,
-                          "LinePos": 0
+                          "LinePos": 0,
+                          "File": ""
                         },
                         "Value": null
                       }
@@ -1069,7 +1442,8 @@
                       "Type": 21,
                       "Value": "string",
                       "Line": 0,
-                      "LinePos": 0
+                      "LinePos": 0,
+                      "File": ""
                     }
                   }
                 },
@@ -1079,7 +1453,8 @@
                       "Type": 21,
                       "Value": "strlen",
                       "Line": 0,
-                      "LinePos": 0
+                      "LinePos": 0,
+                      "File": ""
                     },
                     "Arguments": [
                       {
@@ -1087,13 +1462,15 @@
                           "Type": 20,
                           "Value": "s",
                           "Line": 0,
-                          "LinePos": 0
+                          "LinePos": 0,
+                          "File": ""
                         },
                         "Type": {
                           "Type": 21,
                           "Value": "string",
                           "Line": 0,
-                          "LinePos": 0
+                          "LinePos": 0,
+                          "File": ""
                         },
                         "Value": null
                       }
@@ -1102,7 +1479,8 @@
                       "Type": 21,
                       "Value": "int",
                       "Line": 0,
-                      "LinePos": 0
+                      "LinePos": 0,
+                      "File": ""
                     }
                   }
                 },
@@ -1112,7 +1490,8 @@
                       "Type": 21,
                       "Value": "IntToString",
                       "Line": 0,
-                      "LinePos": 0
+                      "LinePos": 0,
+                      "File": ""
                     },
                     "Arguments": [
                       {
@@ -1120,13 +1499,15 @@
                           "Type": 20,
                           "Value": "num",
                           "Line": 0,
-                          "LinePos": 0
+                          "LinePos": 0,
+                          "File": ""
                         },
                         "Type": {
                           "Type": 21,
                           "Value": "int",
                           "Line": 0,
-                          "LinePos": 0
+                          "LinePos": 0,
+                          "File": ""
                         },
                         "Value": null
                       }
@@ -1135,7 +1516,8 @@
                       "Type": 21,
                       "Value": "string",
                       "Line": 0,
-                      "LinePos": 0
+                      "LinePos": 0,
+                      "File": ""
                     }
                   }
                 },
@@ -1148,14 +1530,16 @@
                       "Type": 20,
                       "Value": "print",
                       "Line": 16,
-                      "LinePos": 13
+                      "LinePos": 13,
+                      "File": "code.voc"
                     },
                     "Arguments": [
                       {
                         "Type": 19,
                         "Value": "Ne",
                         "Line": 16,
-                        "LinePos": 18
+                        "LinePos": 18,
+                        "File": "code.voc"
                       }
                     ]
                   }
@@ -1178,19 +1562,22 @@
                     "Type": 18,
                     "Value": 5,
                     "Line": 18,
-                    "LinePos": 8
+                    "LinePos": 8,
+                    "File": "code.voc"
                   },
                   "Operator": {
                     "Type": 22,
                     "Value": "==",
                     "Line": 18,
-                    "LinePos": 9
+                    "LinePos": 9,
+                    "File": "code.voc"
                   },
                   "Condition2": {
                     "Type": 18,
                     "Value": 5,
                     "Line": 18,
-                    "LinePos": 11
+                    "LinePos": 11,
+                    "File": "code.voc"
                   }
                 }
               },
@@ -1201,7 +1588,8 @@
                       "Type": 21,
                       "Value": "print",
                       "Line": 0,
-                      "LinePos": 0
+                      "LinePos": 0,
+                      "File": ""
                     },
                     "Arguments": [
                       {
@@ -1209,13 +1597,15 @@
                           "Type": 20,
                           "Value": "s",
                           "Line": 0,
-                          "LinePos": 0
+                          "LinePos": 0,
+                          "File": ""
                         },
                         "Type": {
                           "Type": 21,
                           "Value": "string",
                           "Line": 0,
-                          "LinePos": 0
+                          "LinePos": 0,
+                          "File": ""
                         },
                         "Value": null
                       }
@@ -1224,7 +1614,8 @@
                       "Type": 21,
                       "Value": "void",
                       "Line": 0,
-                      "LinePos": 0
+                      "LinePos": 0,
+                      "File": ""
                     }
                   }
                 },
@@ -1234,7 +1625,8 @@
                       "Type": 21,
                       "Value": "append",
                       "Line": 0,
-                      "LinePos": 0
+                      "LinePos": 0,
+                      "File": ""
                     },
                     "Arguments": [
                       {
@@ -1242,13 +1634,15 @@
                           "Type": 20,
                           "Value": "s1",
                           "Line": 0,
-                          "LinePos": 0
+                          "LinePos": 0,
+                          "File": ""
                         },
                         "Type": {
                           "Type": 21,
                           "Value": "string",
                           "Line": 0,
-                          "LinePos": 0
+                          "LinePos": 0,
+                          "File": ""
                         },
                         "Value": null
                       },
@@ -1257,13 +1651,15 @@
                           "Type": 20,
                           "Value": "s2",
                           "Line": 0,
-                          "LinePos": 0
+                          "LinePos": 0,
+                          "File": ""
                         },
                         "Type": {
                           "Type": 21,
                           "Value": "string",
                           "Line": 0,
-                          "LinePos": 0
+                          "LinePos": 0,
+                          "File": ""
                         },
                         "Value": null
                       }
@@ -1272,7 +1668,8 @@
                       "Type": 21,
                       "Value": "string",
                       "Line": 0,
-                      "LinePos": 0
+                      "LinePos": 0,
+                      "File": ""
                     }
                   }
                 },
@@ -1282,7 +1679,8 @@
                       "Type": 21,
                       "Value": "strlen",
                       "Line": 0,
-                      "LinePos": 0
+                      "LinePos": 0,
+                      "File": ""
                     },
                     "Arguments": [
                       {
@@ -1290,13 +1688,15 @@
                           "Type": 20,
                           "Value": "s",
                           "Line": 0,
-                          "LinePos": 0
+                          "LinePos": 0,
+                          "File": ""
                         },
                         "Type": {
                           "Type": 21,
                           "Value": "string",
                           "Line": 0,
-                          "LinePos": 0
+                          "LinePos": 0,
+                          "File": ""
                         },
                         "Value": null
                       }
@@ -1305,7 +1705,8 @@
                       "Type": 21,
                       "Value": "int",
                       "Line": 0,
-                      "LinePos": 0
+                      "LinePos": 0,
+                      "File": ""
                     }
                   }
                 },
@@ -1315,7 +1716,8 @@
                       "Type": 21,
                       "Value": "IntToString",
                       "Line": 0,
-                      "LinePos": 0
+                      "LinePos": 0,
+                      "File": ""
                     },
                     "Arguments": [
                       {
@@ -1323,13 +1725,15 @@
                           "Type": 20,
                           "Value": "num",
                           "Line": 0,
-                          "LinePos": 0
+                          "LinePos": 0,
+                          "File": ""
                         },
                         "Type": {
                           "Type": 21,
                           "Value": "int",
                           "Line": 0,
-                          "LinePos": 0
+                          "LinePos": 0,
+                          "File": ""
                         },
                         "Value": null
                       }
@@ -1338,7 +1742,8 @@
                       "Type": 21,
                       "Value": "string",
                       "Line": 0,
-                      "LinePos": 0
+                      "LinePos": 0,
+                      "File": ""
                     }
                   }
                 },
@@ -1351,14 +1756,16 @@
                       "Type": 20,
                       "Value": "print",
                       "Line": 19,
-                      "LinePos": 13
+                      "LinePos": 13,
+                      "File": "code.voc"
                     },
                     "Arguments": [
                       {
                         "Type": 19,
                         "Value": "Ahoj",
                         "Line": 19,
-                        "LinePos": 20
+                        "LinePos": 20,
+                        "File": "code.voc"
                       }
                     ]
                   }
@@ -1381,7 +1788,8 @@
                   "Type": 20,
                   "Value": "b",
                   "Line": 21,
-                  "LinePos": 9
+                  "LinePos": 9,
+                  "File": "code.voc"
                 }
               },
               "Consequence": [
@@ -1391,7 +1799,8 @@
                       "Type": 21,
                       "Value": "print",
                       "Line": 0,
-                      "LinePos": 0
+                      "LinePos": 0,
+                      "File": ""
                     },
                     "Arguments": [
                       {
@@ -1399,13 +1808,15 @@
                           "Type": 20,
                           "Value": "s",
                           "Line": 0,
-                          "LinePos": 0
+                          "LinePos": 0,
+                          "File": ""
                         },
                         "Type": {
                           "Type": 21,
                           "Value": "string",
                           "Line": 0,
-                          "LinePos": 0
+                          "LinePos": 0,
+                          "File": ""
                         },
                         "Value": null
                       }
@@ -1414,7 +1825,8 @@
                       "Type": 21,
                       "Value": "void",
                       "Line": 0,
-                      "LinePos": 0
+                      "LinePos": 0,
+                      "File": ""
                     }
                   }
                 },
@@ -1424,7 +1836,8 @@
                       "Type": 21,
                       "Value": "append",
                       "Line": 0,
-                      "LinePos": 0
+                      "LinePos": 0,
+                      "File": ""
                     },
                     "Arguments": [
                       {
@@ -1432,13 +1845,15 @@
                           "Type": 20,
                           "Value": "s1",
                           "Line": 0,
-                          "LinePos": 0
+                          "LinePos": 0,
+                          "File": ""
                         },
                         "Type": {
                           "Type": 21,
                           "Value": "string",
                           "Line": 0,
-                          "LinePos": 0
+                          "LinePos": 0,
+                          "File": ""
                         },
                         "Value": null
                       },
@@ -1447,13 +1862,15 @@
                           "Type": 20,
                           "Value": "s2",
                           "Line": 0,
-                          "LinePos": 0
+                          "LinePos": 0,
+                          "File": ""
                         },
                         "Type": {
                           "Type": 21,
                           "Value": "string",
                           "Line": 0,
-                          "LinePos": 0
+                          "LinePos": 0,
+                          "File": ""
                         },
                         "Value": null
                       }
@@ -1462,7 +1879,8 @@
                       "Type": 21,
                       "Value": "string",
                       "Line": 0,
-                      "LinePos": 0
+                      "LinePos": 0,
+                      "File": ""
                     }
                   }
                 },
@@ -1472,7 +1890,8 @@
                       "Type": 21,
                       "Value": "strlen",
                       "Line": 0,
-                      "LinePos": 0
+                      "LinePos": 0,
+                      "File": ""
                     },
                     "Arguments": [
                       {
@@ -1480,13 +1899,15 @@
                           "Type": 20,
                           "Value": "s",
                           "Line": 0,
-                          "LinePos": 0
+                          "LinePos": 0,
+                          "File": ""
                         },
                         "Type": {
                           "Type": 21,
                           "Value": "string",
                           "Line": 0,
-                          "LinePos": 0
+                          "LinePos": 0,
+                          "File": ""
                         },
                         "Value": null
                       }
@@ -1495,7 +1916,8 @@
                       "Type": 21,
                       "Value": "int",
                       "Line": 0,
-                      "LinePos": 0
+                      "LinePos": 0,
+                      "File": ""
                     }
                   }
                 },
@@ -1505,7 +1927,8 @@
                       "Type": 21,
                       "Value": "IntToString",
                       "Line": 0,
-                      "LinePos": 0
+                      "LinePos": 0,
+                      "File": ""
                     },
                     "Arguments": [
                       {
@@ -1513,13 +1936,15 @@
                           "Type": 20,
                           "Value": "num",
                           "Line": 0,
-                          "LinePos": 0
+                          "LinePos": 0,
+                          "File": ""
                         },
                         "Type": {
                           "Type": 21,
                           "Value": "int",
                           "Line": 0,
-                          "LinePos": 0
+                          "LinePos": 0,
+                          "File": ""
                         },
                         "Value": null
                       }
@@ -1528,7 +1953,8 @@
                       "Type": 21,
                       "Value": "string",
                       "Line": 0,
-                      "LinePos": 0
+                      "LinePos": 0,
+                      "File": ""
                     }
                   }
                 },
@@ -1541,14 +1967,16 @@
                       "Type": 20,
                       "Value": "print",
                       "Line": 22,
-                      "LinePos": 13
+                      "LinePos": 13,
+                      "File": "code.voc"
                     },
                     "Arguments": [
                       {
                         "Type": 19,
                         "Value": "false",
                         "Line": 22,
-                        "LinePos": 21
+                        "LinePos": 21,
+                        "File": "code.voc"
                       }
                     ]
                   }
@@ -1567,7 +1995,8 @@
                       "Type": 21,
                       "Value": "print",
                       "Line": 0,
-                      "LinePos": 0
+                      "LinePos": 0,
+                      "File": ""
                     },
                     "Arguments": [
                       {
@@ -1575,13 +2004,15 @@
                           "Type": 20,
                           "Value": "s",
                           "Line": 0,
-                          "LinePos": 0
+                          "LinePos": 0,
+                          "File": ""
                         },
                         "Type": {
                           "Type": 21,
                           "Value": "string",
                           "Line": 0,
-                          "LinePos": 0
+                          "LinePos": 0,
+                          "File": ""
                         },
                         "Value": null
                       }
@@ -1590,7 +2021,8 @@
                       "Type": 21,
                       "Value": "void",
                       "Line": 0,
-                      "LinePos": 0
+                      "LinePos": 0,
+                      "File": ""
                     }
                   }
                 },
@@ -1600,7 +2032,8 @@
                       "Type": 21,
                       "Value": "append",
                       "Line": 0,
-                      "LinePos": 0
+                      "LinePos": 0,
+                      "File": ""
                     },
                     "Arguments": [
                       {
@@ -1608,13 +2041,15 @@
                           "Type": 20,
                           "Value": "s1",
                           "Line": 0,
-                          "LinePos": 0
+                          "LinePos": 0,
+                          "File": ""
                         },
                         "Type": {
                           "Type": 21,
                           "Value": "string",
                           "Line": 0,
-                          "LinePos": 0
+                          "LinePos": 0,
+                          "File": ""
                         },
                         "Value": null
                       },
@@ -1623,13 +2058,15 @@
                           "Type": 20,
                           "Value": "s2",
                           "Line": 0,
-                          "LinePos": 0
+                          "LinePos": 0,
+                          "File": ""
                         },
                         "Type": {
                           "Type": 21,
                           "Value": "string",
                           "Line": 0,
-                          "LinePos": 0
+                          "LinePos": 0,
+                          "File": ""
                         },
                         "Value": null
                       }
@@ -1638,7 +2075,8 @@
                       "Type": 21,
                       "Value": "string",
                       "Line": 0,
-                      "LinePos": 0
+                      "LinePos": 0,
+                      "File": ""
                     }
                   }
                 },
@@ -1648,7 +2086,8 @@
                       "Type": 21,
                       "Value": "strlen",
                       "Line": 0,
-                      "LinePos": 0
+                      "LinePos": 0,
+                      "File": ""
                     },
                     "Arguments": [
                       {
@@ -1656,13 +2095,15 @@
                           "Type": 20,
                           "Value": "s",
                           "Line": 0,
-                          "LinePos": 0
+                          "LinePos": 0,
+                          "File": ""
                         },
                         "Type": {
                           "Type": 21,
                           "Value": "string",
                           "Line": 0,
-                          "LinePos": 0
+                          "LinePos": 0,
+                          "File": ""
                         },
                         "Value": null
                       }
@@ -1671,7 +2112,8 @@
                       "Type": 21,
                       "Value": "int",
                       "Line": 0,
-                      "LinePos": 0
+                      "LinePos": 0,
+                      "File": ""
                     }
                   }
                 },
@@ -1681,7 +2123,8 @@
                       "Type": 21,
                       "Value": "IntToString",
                       "Line": 0,
-                      "LinePos": 0
+                      "LinePos": 0,
+                      "File": ""
                     },
                     "Arguments": [
                       {
@@ -1689,13 +2132,15 @@
                           "Type": 20,
                           "Value": "num",
                           "Line": 0,
-                          "LinePos": 0
+                          "LinePos": 0,
+                          "File": ""
                         },
                         "Type": {
                           "Type": 21,
                           "Value": "int",
                           "Line": 0,
-                          "LinePos": 0
+                          "LinePos": 0,
+                          "File": ""
                         },
                         "Value": null
                       }
@@ -1704,7 +2149,8 @@
                       "Type": 21,
                       "Value": "string",
                       "Line": 0,
-                      "LinePos": 0
+                      "LinePos": 0,
+                      "File": ""
                     }
                   }
                 },
@@ -1717,14 +2163,16 @@
                       "Type": 20,
                       "Value": "print",
                       "Line": 24,
-                      "LinePos": 13
+                      "LinePos": 13,
+                      "File": "code.voc"
                     },
                     "Arguments": [
                       {
                         "Type": 19,
                         "Value": "true",
                         "Line": 24,
-                        "LinePos": 20
+                        "LinePos": 20,
+                        "File": "code.voc"
                       }
                     ]
                   }
@@ -1737,6 +2185,58 @@
                 }
               ]
             }
+          },
+          {
+            "Node": {
+              "Name": {
+                "Type": 20,
+                "Value": "print",
+                "Line": 26,
+                "LinePos": 40,
+                "File": "code.voc"
+              },
+              "Arguments": [
+                {
+                  "Name": {
+                    "Type": 20,
+                    "Value": "IntToString",
+                    "Line": 26,
+                    "LinePos": 52,
+                    "File": "code.voc"
+                  },
+                  "Arguments": [
+                    {
+                      "Name": {
+                        "Type": 20,
+                        "Value": "math.Add",
+                        "Line": 26,
+                        "LinePos": 61,
+                        "File": "code.voc"
+                      },
+                      "Arguments": [
+                        {
+                          "Type": 18,
+                          "Value": 5,
+                          "Line": 26,
+                          "LinePos": 63,
+                          "File": "code.voc"
+                        },
+                        {
+                          "Type": 18,
+                          "Value": 5,
+                          "Line": 26,
+                          "LinePos": 66,
+                          "File": "code.voc"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          },
+          {
+            "Node": null
           },
           {
             "Node": null

@@ -1,4 +1,4 @@
-
+import "math"
 func main(){
     int i = 5+5*3+5
     while i>0{
@@ -23,4 +23,6 @@ func main(){
     } else {
         print("true")
     }
+   // int i2 = math.Add(5, 5)
+    print(IntToString(math.Add(5, 5)))
 }

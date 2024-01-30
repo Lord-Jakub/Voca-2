@@ -170,15 +170,8 @@ func GenerateIR(program ast.Program) string {
 		case ast.FuncDeclaration:
 
 			var fn *ir.Func
-			par := statement.(ast.FuncDeclaration).Arguments
-			var params []*ir.Param
-			for i := 0; i < len(par); i++ {
-				if par[i].(ast.VariableDeclaration).Type.Value == "int" {
-					params = append(params, ir.NewParam(par[i].(ast.VariableDeclaration).Name.Value.(string), types.I32))
-				} else if par[i].(ast.VariableDeclaration).Type.Value == "string" {
-					params = append(params, ir.NewParam(par[i].(ast.VariableDeclaration).Name.Value.(string), types.I8Ptr))
-				}
-			}
+			var vars map[string]Variable
+			vars = make(map[string]Variable)
 			if statement.(ast.FuncDeclaration).Type.Value.(string) == "int" {
 				fn = module.NewFunc(statement.(ast.FuncDeclaration).Name.Value.(string), types.I32)
 			} else if statement.(ast.FuncDeclaration).Type.Value.(string) == "string" {
@@ -186,17 +179,46 @@ func GenerateIR(program ast.Program) string {
 			} else if statement.(ast.FuncDeclaration).Type.Value.(string) == "void" {
 				fn = module.NewFunc(statement.(ast.FuncDeclaration).Name.Value.(string), types.Void)
 			}
-			fn.Params = params
 			entry := fn.NewBlock("entry")
+			par := statement.(ast.FuncDeclaration).Arguments
+			var params []*ir.Param
+			for i := 0; i < len(par); i++ {
+				variable := Variable{}
+				if par[i].(ast.VariableDeclaration).Type.Value == "int" {
+					params = append(params, ir.NewParam(par[i].(ast.VariableDeclaration).Name.Value.(string), types.I32))
+					variab := entry.NewAlloca(types.I32)
+					entry.NewStore(params[len(params)-1], variab)
+					variable.Value = variab
+					variable.Type = "int"
+				} else if par[i].(ast.VariableDeclaration).Type.Value == "string" {
+					params = append(params, ir.NewParam(par[i].(ast.VariableDeclaration).Name.Value.(string), types.I8Ptr))
+					variab := entry.NewAlloca(types.I8Ptr)
+					entry.NewStore(params[len(params)-1], variab)
+					variable.Value = variab
+					variable.Type = "string"
+				} else if statement.(ast.FuncDeclaration).Arguments[i].(ast.VariableDeclaration).Type.Value == "bool" {
+					params = append(params, ir.NewParam(par[i].(ast.VariableDeclaration).Name.Value.(string), types.I1))
+					variab := entry.NewAlloca(types.I1)
+					entry.NewStore(params[len(params)-1], variab)
+					variable.Value = variab
+					variable.Type = "bool"
+				}
+				vars[statement.(ast.FuncDeclaration).Arguments[i].(ast.VariableDeclaration).Name.Value.(string)] = variable
+			}
+
+			fn.Params = params
+
 			function := Function{Type: statement.(ast.FuncDeclaration).Type.Value.(string), Value: fn}
 			Functions[statement.(ast.FuncDeclaration).Name.Value.(string)] = function
-			entry = Compile(entry, statement.(ast.FuncDeclaration).Body, make(map[string]Variable))
-			if statement.(ast.FuncDeclaration).Type.Value.(string) == "int" {
-				entry.NewRet(constant.NewInt(types.I32, 0))
-			} else if statement.(ast.FuncDeclaration).Type.Value.(string) == "string" {
-				entry.NewRet(constant.NewPtrToInt(constant.NewInt(types.I32, 0), types.I8Ptr))
-			} else if statement.(ast.FuncDeclaration).Type.Value.(string) == "void" {
-				entry.NewRet(nil)
+			entry = Compile(entry, statement.(ast.FuncDeclaration).Body, vars)
+			if entry.Term == nil {
+				if statement.(ast.FuncDeclaration).Type.Value.(string) == "int" {
+					entry.NewRet(constant.NewInt(types.I32, 0))
+				} else if statement.(ast.FuncDeclaration).Type.Value.(string) == "string" {
+					entry.NewRet(constant.NewPtrToInt(constant.NewInt(types.I32, 0), types.I8Ptr))
+				} else if statement.(ast.FuncDeclaration).Type.Value.(string) == "void" {
+					entry.NewRet(nil)
+				}
 			}
 		case ast.ExternFuncDeclaration:
 			var fn *ir.Func
@@ -477,6 +499,41 @@ func Compile(block *ir.Block, statements []ast.Statement, variables map[string]V
 			block.NewCondBr(condition, loopBlock, afterBlock)
 
 			block = afterBlock
+		case ast.ReturnStatement:
+			value := statement.(ast.ReturnStatement).Value
+			switch value.(type) {
+			case ast.ExpressionStatement:
+				exp := CompileExpression(block, value.(ast.ExpressionStatement), variables)
+				block.NewRet(exp)
+			case lexer.Token:
+				if value.(lexer.Token).Type == lexer.Int {
+					block.NewRet(constant.NewInt(types.I32, int64(value.(lexer.Token).Value.(int))))
+				} else if value.(lexer.Token).Type == lexer.String {
+					str := constant.NewCharArrayFromString(value.(lexer.Token).Value.(string) + "\x00")
+					strvar := block.NewAlloca(types.NewArray(uint64(str.Typ.Len), types.I8))
+					block.NewStore(str, strvar)
+					strPtr := block.NewGetElementPtr(types.NewArray(uint64(str.Typ.Len), types.I8), strvar, constant.NewInt(types.I32, 0), constant.NewInt(types.I32, 0))
+					block.NewRet(strPtr)
+				} else if value.(lexer.Token).Type == lexer.Identifier {
+					if variables[value.(lexer.Token).Value.(string)].Type == "string" {
+						block.NewRet(block.NewLoad(types.NewArray(uint64(variables[value.(lexer.Token).Value.(string)].length), types.I8), variables[value.(lexer.Token).Value.(string)].Value))
+					} else if variables[value.(lexer.Token).Value.(string)].Type == "int" {
+						value := block.NewLoad(types.I32, variables[value.(lexer.Token).Value.(string)].Value)
+						block.NewRet(value)
+					} else if variables[value.(lexer.Token).Value.(string)].Type == "bool" {
+						value := block.NewLoad(types.I1, variables[value.(lexer.Token).Value.(string)].Value)
+						block.NewRet(value)
+					}
+				} else if value.(lexer.Token).Value == "true" {
+					block.NewRet(constant.NewBool(true))
+				} else if value.(lexer.Token).Value == "false" {
+					block.NewRet(constant.NewBool(false))
+				}
+			case ast.FuncCall:
+				name := value.(ast.FuncCall).Name.Value.(string)
+				arguments := FuncCall(block, value.(ast.FuncCall), variables)
+				block.NewRet(block.NewCall(Functions[name].Value, arguments...))
+			}
 
 		}
 		i++
@@ -494,7 +551,7 @@ func FuncCall(block *ir.Block, function ast.FuncCall, variables map[string]Varia
 			arguments = append(arguments, CompileExpression(block, arg.(ast.ExpressionStatement), variables))
 		case lexer.Token:
 			if arg.(lexer.Token).Type == lexer.Int {
-				arguments = append(arguments, constant.NewInt(types.I32, arg.(lexer.Token).Value.(int64)))
+				arguments = append(arguments, constant.NewInt(types.I32, int64(arg.(lexer.Token).Value.(int))))
 			} else if arg.(lexer.Token).Type == lexer.Identifier {
 				if variables[arg.(lexer.Token).Value.(string)].Type == "string" {
 					arguments = append(arguments, block.NewLoad(types.I8Ptr, variables[arg.(lexer.Token).Value.(string)].Value))
@@ -517,7 +574,6 @@ func FuncCall(block *ir.Block, function ast.FuncCall, variables map[string]Varia
 			arguments = append(arguments, block.NewCall(Functions[name2].Value, args2...))
 
 		}
-		i++
 	}
 	return arguments
 }
@@ -655,26 +711,8 @@ func CompileExpression(block *ir.Block, expression ast.ExpressionStatement, vari
 				}
 			case ast.FuncCall:
 				name2 := expression.Right.(ast.FuncCall).Name.Value.(string)
-				args2 := expression.Right.(ast.FuncCall).Arguments
-				var arguments2 []value.Value
-				for _, arg := range args2 {
-					switch arg.(type) {
-					case ast.ExpressionStatement:
-						arguments2 = append(arguments2, CompileExpression(block, arg.(ast.ExpressionStatement), variables))
-					case lexer.Token:
-						if arg.(lexer.Token).Type == lexer.Int {
-							arguments2 = append(arguments2, constant.NewInt(types.I32, arg.(lexer.Token).Value.(int64)))
-						} else if arg.(lexer.Token).Type == lexer.Identifier {
-							arguments2 = append(arguments2, variables[arg.(lexer.Token).Value.(string)].Value)
-						} else if arg.(lexer.Token).Type == lexer.String {
-							str := constant.NewCharArrayFromString(arg.(lexer.Token).Value.(string) + "\x00")
-							strvar := block.NewAlloca(types.NewArray(uint64(str.Typ.Len), types.I8))
-							block.NewStore(str, strvar)
-							strPtr := block.NewGetElementPtr(types.NewArray(uint64(str.Typ.Len), types.I8), strvar, constant.NewInt(types.I32, 0), constant.NewInt(types.I32, 0))
-							arguments2 = append(arguments2, strPtr)
-						}
-					}
-				}
+
+				arguments2 := FuncCall(block, expression.Right.(ast.FuncCall), variables)
 				if Functions[name2].Type == "int" && expression.Left.(lexer.Token).Type == lexer.Int {
 					return block.NewAdd(constant.NewInt(types.I32, int64(expression.Left.(lexer.Token).Value.(int))), block.NewCall(Functions[name2].Value, arguments2...))
 				} else if Functions[name2].Type == "int" && expression.Left.(lexer.Token).Type == lexer.Identifier {
@@ -685,33 +723,7 @@ func CompileExpression(block *ir.Block, expression ast.ExpressionStatement, vari
 			}
 		case ast.FuncCall:
 			name := expression.Left.(ast.FuncCall).Name.Value.(string)
-			args := expression.Left.(ast.FuncCall).Arguments
-			var arguments []value.Value
-			for _, arg := range args {
-				switch arg.(type) {
-				case ast.ExpressionStatement:
-					arguments = append(arguments, CompileExpression(block, arg.(ast.ExpressionStatement), variables))
-				case lexer.Token:
-					if arg.(lexer.Token).Type == lexer.Int {
-						arguments = append(arguments, constant.NewInt(types.I32, arg.(lexer.Token).Value.(int64)))
-					} else if arg.(lexer.Token).Type == lexer.Identifier {
-						if variables[arg.(lexer.Token).Value.(string)].Type == "string" {
-							arguments = append(arguments, block.NewLoad(types.I8Ptr, variables[arg.(lexer.Token).Value.(string)].Value))
-						} else if variables[arg.(lexer.Token).Value.(string)].Type == "int" {
-							arguments = append(arguments, block.NewLoad(types.I32, variables[arg.(lexer.Token).Value.(string)].Value))
-						} else if variables[arg.(lexer.Token).Value.(string)].Type == "bool" {
-							arguments = append(arguments, block.NewLoad(types.I1, variables[arg.(lexer.Token).Value.(string)].Value))
-
-						}
-					} else if arg.(lexer.Token).Type == lexer.String {
-						str := constant.NewCharArrayFromString(arg.(lexer.Token).Value.(string) + "\x00")
-						strvar := block.NewAlloca(types.NewArray(uint64(str.Typ.Len), types.I8))
-						block.NewStore(str, strvar)
-						strPtr := block.NewGetElementPtr(types.NewArray(uint64(str.Typ.Len), types.I8), strvar, constant.NewInt(types.I32, 0), constant.NewInt(types.I32, 0))
-						arguments = append(arguments, strPtr)
-					}
-				}
-			}
+			arguments := FuncCall(block, expression.Left.(ast.FuncCall), variables)
 			switch expression.Right.(type) {
 			case ast.ExpressionStatement:
 				if Functions[name].Type == "int" {
@@ -728,26 +740,7 @@ func CompileExpression(block *ir.Block, expression ast.ExpressionStatement, vari
 				}
 			case ast.FuncCall:
 				name2 := expression.Right.(ast.FuncCall).Name.Value.(string)
-				args2 := expression.Right.(ast.FuncCall).Arguments
-				var arguments2 []value.Value
-				for _, arg := range args2 {
-					switch arg.(type) {
-					case ast.ExpressionStatement:
-						arguments2 = append(arguments2, CompileExpression(block, arg.(ast.ExpressionStatement), variables))
-					case lexer.Token:
-						if arg.(lexer.Token).Type == lexer.Int {
-							arguments2 = append(arguments2, constant.NewInt(types.I32, arg.(lexer.Token).Value.(int64)))
-						} else if arg.(lexer.Token).Type == lexer.Identifier {
-							arguments2 = append(arguments2, variables[arg.(lexer.Token).Value.(string)].Value)
-						} else if arg.(lexer.Token).Type == lexer.String {
-							str := constant.NewCharArrayFromString(arg.(lexer.Token).Value.(string) + "\x00")
-							strvar := block.NewAlloca(types.NewArray(uint64(str.Typ.Len), types.I8))
-							block.NewStore(str, strvar)
-							strPtr := block.NewGetElementPtr(types.NewArray(uint64(str.Typ.Len), types.I8), strvar, constant.NewInt(types.I32, 0), constant.NewInt(types.I32, 0))
-							arguments2 = append(arguments2, strPtr)
-						}
-					}
-				}
+				arguments2 := FuncCall(block, expression.Right.(ast.FuncCall), variables)
 				if Functions[name].Type == "int" && Functions[name2].Type == "int" {
 					return block.NewAdd(block.NewCall(Functions[name].Value, arguments...), block.NewCall(Functions[name2].Value, arguments2...))
 				} else if Functions[name].Type == "string" && Functions[name2].Type == "string" {
@@ -795,23 +788,7 @@ func CompileExpression(block *ir.Block, expression ast.ExpressionStatement, vari
 				}
 			case ast.FuncCall:
 				name2 := expression.Right.(ast.FuncCall).Name.Value.(string)
-				args2 := expression.Right.(ast.FuncCall).Arguments
-				var arguments2 []value.Value
-				for _, arg := range args2 {
-					switch arg.(type) {
-					case ast.ExpressionStatement:
-						arguments2 = append(arguments2, CompileExpression(block, arg.(ast.ExpressionStatement), variables))
-					case lexer.Token:
-						if arg.(lexer.Token).Type == lexer.Int {
-							arguments2 = append(arguments2, constant.NewInt(types.I32, arg.(lexer.Token).Value.(int64)))
-						} else if arg.(lexer.Token).Type == lexer.Identifier {
-							arguments2 = append(arguments2, variables[arg.(lexer.Token).Value.(string)].Value)
-						} else if arg.(lexer.Token).Type == lexer.String {
-							str := constant.NewCharArrayFromString(arg.(lexer.Token).Value.(string) + "\x00")
-							arguments2 = append(arguments2, str)
-						}
-					}
-				}
+				arguments2 := FuncCall(block, expression.Right.(ast.FuncCall), variables)
 				if Functions[name2].Type == "int" && expression.Left.(lexer.Token).Type == lexer.Int {
 					return block.NewSub(constant.NewInt(types.I32, int64(expression.Left.(lexer.Token).Value.(int))), block.NewCall(Functions[name2].Value, arguments2...))
 				} else if Functions[name2].Type == "int" && expression.Left.(lexer.Token).Type == lexer.Identifier {
@@ -820,31 +797,7 @@ func CompileExpression(block *ir.Block, expression ast.ExpressionStatement, vari
 			}
 		case ast.FuncCall:
 			name := expression.Left.(ast.FuncCall).Name.Value.(string)
-			args := expression.Left.(ast.FuncCall).Arguments
-			var arguments []value.Value
-			for _, arg := range args {
-				switch arg.(type) {
-				case ast.ExpressionStatement:
-					arguments = append(arguments, CompileExpression(block, arg.(ast.ExpressionStatement), variables))
-				case lexer.Token:
-					if arg.(lexer.Token).Type == lexer.Int {
-						arguments = append(arguments, constant.NewInt(types.I32, arg.(lexer.Token).Value.(int64)))
-					} else if arg.(lexer.Token).Type == lexer.Identifier {
-						if variables[arg.(lexer.Token).Value.(string)].Type == "string" {
-							arguments = append(arguments, block.NewLoad(types.I8Ptr, variables[arg.(lexer.Token).Value.(string)].Value))
-						} else if variables[arg.(lexer.Token).Value.(string)].Type == "int" {
-							arguments = append(arguments, block.NewLoad(types.I32, variables[arg.(lexer.Token).Value.(string)].Value))
-						} else if variables[arg.(lexer.Token).Value.(string)].Type == "bool" {
-							arguments = append(arguments, block.NewLoad(types.I1, variables[arg.(lexer.Token).Value.(string)].Value))
-
-						}
-					} else if arg.(lexer.Token).Type == lexer.String {
-						str := constant.NewCharArrayFromString(arg.(lexer.Token).Value.(string) + "\x00")
-						strPtr := block.NewGetElementPtr(types.NewArray(uint64(str.Typ.Len), types.I8), str, constant.NewInt(types.I32, 0), constant.NewInt(types.I32, 0))
-						arguments = append(arguments, strPtr)
-					}
-				}
-			}
+			arguments := FuncCall(block, expression.Left.(ast.FuncCall), variables)
 			switch expression.Right.(type) {
 			case ast.ExpressionStatement:
 				if Functions[name].Type == "int" {
@@ -858,23 +811,7 @@ func CompileExpression(block *ir.Block, expression ast.ExpressionStatement, vari
 				}
 			case ast.FuncCall:
 				name2 := expression.Right.(ast.FuncCall).Name.Value.(string)
-				args2 := expression.Right.(ast.FuncCall).Arguments
-				var arguments2 []value.Value
-				for _, arg := range args2 {
-					switch arg.(type) {
-					case ast.ExpressionStatement:
-						arguments2 = append(arguments2, CompileExpression(block, arg.(ast.ExpressionStatement), variables))
-					case lexer.Token:
-						if arg.(lexer.Token).Type == lexer.Int {
-							arguments2 = append(arguments2, constant.NewInt(types.I32, arg.(lexer.Token).Value.(int64)))
-						} else if arg.(lexer.Token).Type == lexer.Identifier {
-							arguments2 = append(arguments2, variables[arg.(lexer.Token).Value.(string)].Value)
-						} else if arg.(lexer.Token).Type == lexer.String {
-							str := constant.NewCharArrayFromString(arg.(lexer.Token).Value.(string) + "\x00")
-							arguments2 = append(arguments2, str)
-						}
-					}
-				}
+				arguments2 := FuncCall(block, expression.Right.(ast.FuncCall), variables)
 				if Functions[name].Type == "int" && Functions[name2].Type == "int" {
 					return block.NewSub(block.NewCall(Functions[name].Value, arguments...), block.NewCall(Functions[name2].Value, arguments2...))
 				}
@@ -920,23 +857,7 @@ func CompileExpression(block *ir.Block, expression ast.ExpressionStatement, vari
 				}
 			case ast.FuncCall:
 				name2 := expression.Right.(ast.FuncCall).Name.Value.(string)
-				args2 := expression.Right.(ast.FuncCall).Arguments
-				var arguments2 []value.Value
-				for _, arg := range args2 {
-					switch arg.(type) {
-					case ast.ExpressionStatement:
-						arguments2 = append(arguments2, CompileExpression(block, arg.(ast.ExpressionStatement), variables))
-					case lexer.Token:
-						if arg.(lexer.Token).Type == lexer.Int {
-							arguments2 = append(arguments2, constant.NewInt(types.I32, arg.(lexer.Token).Value.(int64)))
-						} else if arg.(lexer.Token).Type == lexer.Identifier {
-							arguments2 = append(arguments2, variables[arg.(lexer.Token).Value.(string)].Value)
-						} else if arg.(lexer.Token).Type == lexer.String {
-							str := constant.NewCharArrayFromString(arg.(lexer.Token).Value.(string) + "\x00")
-							arguments2 = append(arguments2, str)
-						}
-					}
-				}
+				arguments2 := FuncCall(block, expression.Right.(ast.FuncCall), variables)
 				if Functions[name2].Type == "int" && expression.Left.(lexer.Token).Type == lexer.Int {
 					return block.NewMul(constant.NewInt(types.I32, int64(expression.Left.(lexer.Token).Value.(int))), block.NewCall(Functions[name2].Value, arguments2...))
 				} else if Functions[name2].Type == "int" && expression.Left.(lexer.Token).Type == lexer.Identifier {
@@ -945,33 +866,7 @@ func CompileExpression(block *ir.Block, expression ast.ExpressionStatement, vari
 			}
 		case ast.FuncCall:
 			name := expression.Left.(ast.FuncCall).Name.Value.(string)
-			args := expression.Left.(ast.FuncCall).Arguments
-			var arguments []value.Value
-			for _, arg := range args {
-				switch arg.(type) {
-				case ast.ExpressionStatement:
-					arguments = append(arguments, CompileExpression(block, arg.(ast.ExpressionStatement), variables))
-				case lexer.Token:
-					if arg.(lexer.Token).Type == lexer.Int {
-						arguments = append(arguments, constant.NewInt(types.I32, arg.(lexer.Token).Value.(int64)))
-					} else if arg.(lexer.Token).Type == lexer.Identifier {
-						if variables[arg.(lexer.Token).Value.(string)].Type == "string" {
-							arguments = append(arguments, block.NewLoad(types.I8Ptr, variables[arg.(lexer.Token).Value.(string)].Value))
-						} else if variables[arg.(lexer.Token).Value.(string)].Type == "int" {
-							arguments = append(arguments, block.NewLoad(types.I32, variables[arg.(lexer.Token).Value.(string)].Value))
-						} else if variables[arg.(lexer.Token).Value.(string)].Type == "bool" {
-							arguments = append(arguments, block.NewLoad(types.I1, variables[arg.(lexer.Token).Value.(string)].Value))
-
-						}
-					} else if arg.(lexer.Token).Type == lexer.String {
-						str := constant.NewCharArrayFromString(arg.(lexer.Token).Value.(string) + "\x00")
-						strvar := block.NewAlloca(types.NewArray(uint64(str.Typ.Len), types.I8))
-						block.NewStore(str, strvar)
-						strPtr := block.NewGetElementPtr(types.NewArray(uint64(str.Typ.Len), types.I8), strvar, constant.NewInt(types.I32, 0), constant.NewInt(types.I32, 0))
-						arguments = append(arguments, strPtr)
-					}
-				}
-			}
+			arguments := FuncCall(block, expression.Left.(ast.FuncCall), variables)
 			switch expression.Right.(type) {
 			case ast.ExpressionStatement:
 				if Functions[name].Type == "int" {
@@ -985,23 +880,7 @@ func CompileExpression(block *ir.Block, expression ast.ExpressionStatement, vari
 				}
 			case ast.FuncCall:
 				name2 := expression.Right.(ast.FuncCall).Name.Value.(string)
-				args2 := expression.Right.(ast.FuncCall).Arguments
-				var arguments2 []value.Value
-				for _, arg := range args2 {
-					switch arg.(type) {
-					case ast.ExpressionStatement:
-						arguments2 = append(arguments2, CompileExpression(block, arg.(ast.ExpressionStatement), variables))
-					case lexer.Token:
-						if arg.(lexer.Token).Type == lexer.Int {
-							arguments2 = append(arguments2, constant.NewInt(types.I32, arg.(lexer.Token).Value.(int64)))
-						} else if arg.(lexer.Token).Type == lexer.Identifier {
-							arguments2 = append(arguments2, variables[arg.(lexer.Token).Value.(string)].Value)
-						} else if arg.(lexer.Token).Type == lexer.String {
-							str := constant.NewCharArrayFromString(arg.(lexer.Token).Value.(string) + "\x00")
-							arguments2 = append(arguments2, str)
-						}
-					}
-				}
+				arguments2 := FuncCall(block, expression.Right.(ast.FuncCall), variables)
 				if Functions[name].Type == "int" && Functions[name2].Type == "int" {
 					return block.NewMul(block.NewCall(Functions[name].Value, arguments...), block.NewCall(Functions[name2].Value, arguments2...))
 				}
@@ -1046,23 +925,7 @@ func CompileExpression(block *ir.Block, expression ast.ExpressionStatement, vari
 				}
 			case ast.FuncCall:
 				name2 := expression.Right.(ast.FuncCall).Name.Value.(string)
-				args2 := expression.Right.(ast.FuncCall).Arguments
-				var arguments2 []value.Value
-				for _, arg := range args2 {
-					switch arg.(type) {
-					case ast.ExpressionStatement:
-						arguments2 = append(arguments2, CompileExpression(block, arg.(ast.ExpressionStatement), variables))
-					case lexer.Token:
-						if arg.(lexer.Token).Type == lexer.Int {
-							arguments2 = append(arguments2, constant.NewInt(types.I32, arg.(lexer.Token).Value.(int64)))
-						} else if arg.(lexer.Token).Type == lexer.Identifier {
-							arguments2 = append(arguments2, variables[arg.(lexer.Token).Value.(string)].Value)
-						} else if arg.(lexer.Token).Type == lexer.String {
-							str := constant.NewCharArrayFromString(arg.(lexer.Token).Value.(string) + "\x00")
-							arguments2 = append(arguments2, str)
-						}
-					}
-				}
+				arguments2 := FuncCall(block, expression.Right.(ast.FuncCall), variables)
 				if Functions[name2].Type == "int" && expression.Left.(lexer.Token).Type == lexer.Int {
 					return block.NewSDiv(constant.NewInt(types.I32, int64(expression.Left.(lexer.Token).Value.(int))), block.NewCall(Functions[name2].Value, arguments2...))
 				} else if Functions[name2].Type == "int" && expression.Left.(lexer.Token).Type == lexer.Identifier {
@@ -1071,31 +934,7 @@ func CompileExpression(block *ir.Block, expression ast.ExpressionStatement, vari
 			}
 		case ast.FuncCall:
 			name := expression.Left.(ast.FuncCall).Name.Value.(string)
-			args := expression.Left.(ast.FuncCall).Arguments
-			var arguments []value.Value
-			for _, arg := range args {
-				switch arg.(type) {
-				case ast.ExpressionStatement:
-					arguments = append(arguments, CompileExpression(block, arg.(ast.ExpressionStatement), variables))
-				case lexer.Token:
-					if arg.(lexer.Token).Type == lexer.Int {
-						arguments = append(arguments, constant.NewInt(types.I32, arg.(lexer.Token).Value.(int64)))
-					} else if arg.(lexer.Token).Type == lexer.Identifier {
-						if variables[arg.(lexer.Token).Value.(string)].Type == "string" {
-							arguments = append(arguments, block.NewLoad(types.I8Ptr, variables[arg.(lexer.Token).Value.(string)].Value))
-						} else if variables[arg.(lexer.Token).Value.(string)].Type == "int" {
-							arguments = append(arguments, block.NewLoad(types.I32, variables[arg.(lexer.Token).Value.(string)].Value))
-						} else if variables[arg.(lexer.Token).Value.(string)].Type == "bool" {
-							arguments = append(arguments, block.NewLoad(types.I1, variables[arg.(lexer.Token).Value.(string)].Value))
-
-						}
-					} else if arg.(lexer.Token).Type == lexer.String {
-						str := constant.NewCharArrayFromString(arg.(lexer.Token).Value.(string) + "\x00")
-						strPtr := block.NewGetElementPtr(types.NewArray(uint64(str.Typ.Len), types.I8), str, constant.NewInt(types.I32, 0), constant.NewInt(types.I32, 0))
-						arguments = append(arguments, strPtr)
-					}
-				}
-			}
+			arguments := FuncCall(block, expression.Left.(ast.FuncCall), variables)
 			switch expression.Right.(type) {
 			case ast.ExpressionStatement:
 				if Functions[name].Type == "int" {
@@ -1109,23 +948,7 @@ func CompileExpression(block *ir.Block, expression ast.ExpressionStatement, vari
 				}
 			case ast.FuncCall:
 				name2 := expression.Right.(ast.FuncCall).Name.Value.(string)
-				args2 := expression.Right.(ast.FuncCall).Arguments
-				var arguments2 []value.Value
-				for _, arg := range args2 {
-					switch arg.(type) {
-					case ast.ExpressionStatement:
-						arguments2 = append(arguments2, CompileExpression(block, arg.(ast.ExpressionStatement), variables))
-					case lexer.Token:
-						if arg.(lexer.Token).Type == lexer.Int {
-							arguments2 = append(arguments2, constant.NewInt(types.I32, arg.(lexer.Token).Value.(int64)))
-						} else if arg.(lexer.Token).Type == lexer.Identifier {
-							arguments2 = append(arguments2, variables[arg.(lexer.Token).Value.(string)].Value)
-						} else if arg.(lexer.Token).Type == lexer.String {
-							str := constant.NewCharArrayFromString(arg.(lexer.Token).Value.(string) + "\x00")
-							arguments2 = append(arguments2, str)
-						}
-					}
-				}
+				arguments2 := FuncCall(block, expression.Right.(ast.FuncCall), variables)
 				if Functions[name].Type == "int" && Functions[name2].Type == "int" {
 					return block.NewSDiv(block.NewCall(Functions[name].Value, arguments...), block.NewCall(Functions[name2].Value, arguments2...))
 				}

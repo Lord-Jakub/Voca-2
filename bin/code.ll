@@ -6,6 +6,18 @@ declare i32 @strlen(i8* %s)
 
 declare i8* @IntToString(i32 %num)
 
+define i32 @math.Add(i32 %x, i32 %y) {
+entry:
+	%0 = alloca i32
+	store i32 %x, i32* %0
+	%1 = alloca i32
+	store i32 %y, i32* %1
+	%2 = load i32, i32* %0
+	%3 = load i32, i32* %1
+	%4 = add i32 %2, %3
+	ret i32 %4
+}
+
 define void @main() {
 entry:
 	%i = alloca i32
@@ -105,5 +117,8 @@ false4:
 	br label %after4
 
 after4:
+	%36 = call i32 @math.Add(i32 5, i32 5)
+	%37 = call i8* @IntToString(i32 %36)
+	call void @print(i8* %37)
 	ret void
 }
