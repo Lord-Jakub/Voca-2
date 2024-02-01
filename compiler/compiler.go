@@ -610,7 +610,7 @@ func CompileBool(block *ir.Block, condition ast.BoolStatement, variables map[str
 				if variables[condition.Bool.(ast.BoolExpression).Condition2.(lexer.Token).Value.(string)].Type == "string" {
 					con2 = block.NewLoad(types.NewArray(uint64(variables[condition.Bool.(ast.BoolExpression).Condition2.(lexer.Token).Value.(string)].length), types.I8), con2)
 				}
-			} else if condition.Bool.(ast.BoolExpression).Condition1.(lexer.Token).Type == lexer.String {
+			} else if condition.Bool.(ast.BoolExpression).Condition2.(lexer.Token).Type == lexer.String {
 				con2 = constant.NewCharArrayFromString(condition.Bool.(ast.BoolExpression).Condition2.(lexer.Token).Value.(string) + "\x00")
 			}
 		}

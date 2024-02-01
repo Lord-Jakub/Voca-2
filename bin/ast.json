@@ -626,40 +626,42 @@
               },
               "Value": {
                 "Left": {
-                  "Type": 18,
-                  "Value": 5,
-                  "Line": 3,
-                  "LinePos": 13,
-                  "File": "code.voc"
-                },
-                "Operator": {
-                  "Type": 5,
-                  "Value": "+",
-                  "Line": 3,
-                  "LinePos": 14,
-                  "File": "code.voc"
-                },
-                "Right": {
                   "Left": {
                     "Left": {
-                      "Type": 18,
-                      "Value": 5,
-                      "Line": 3,
-                      "LinePos": 15,
-                      "File": "code.voc"
+                      "Left": {
+                        "Type": 18,
+                        "Value": 5,
+                        "Line": 3,
+                        "LinePos": 14,
+                        "File": "code.voc"
+                      },
+                      "Operator": {
+                        "Type": 5,
+                        "Value": "+",
+                        "Line": 3,
+                        "LinePos": 15,
+                        "File": "code.voc"
+                      },
+                      "Right": {
+                        "Type": 18,
+                        "Value": 5,
+                        "Line": 3,
+                        "LinePos": 16,
+                        "File": "code.voc"
+                      }
                     },
                     "Operator": {
                       "Type": 7,
                       "Value": "*",
                       "Line": 3,
-                      "LinePos": 16,
+                      "LinePos": 18,
                       "File": "code.voc"
                     },
                     "Right": {
                       "Type": 18,
                       "Value": 3,
                       "Line": 3,
-                      "LinePos": 17,
+                      "LinePos": 19,
                       "File": "code.voc"
                     }
                   },
@@ -667,14 +669,76 @@
                     "Type": 5,
                     "Value": "+",
                     "Line": 3,
-                    "LinePos": 18,
+                    "LinePos": 20,
                     "File": "code.voc"
                   },
                   "Right": {
                     "Type": 18,
                     "Value": 5,
                     "Line": 3,
-                    "LinePos": 19,
+                    "LinePos": 21,
+                    "File": "code.voc"
+                  }
+                },
+                "Operator": {
+                  "Type": 5,
+                  "Value": "+",
+                  "Line": 3,
+                  "LinePos": 22,
+                  "File": "code.voc"
+                },
+                "Right": {
+                  "Left": {
+                    "Left": {
+                      "Left": {
+                        "Type": 18,
+                        "Value": 15,
+                        "Line": 3,
+                        "LinePos": 24,
+                        "File": "code.voc"
+                      },
+                      "Operator": {
+                        "Type": 6,
+                        "Value": "-",
+                        "Line": 3,
+                        "LinePos": 25,
+                        "File": "code.voc"
+                      },
+                      "Right": {
+                        "Type": 18,
+                        "Value": 5,
+                        "Line": 3,
+                        "LinePos": 26,
+                        "File": "code.voc"
+                      }
+                    },
+                    "Operator": {
+                      "Type": 6,
+                      "Value": "-",
+                      "Line": 3,
+                      "LinePos": 27,
+                      "File": "code.voc"
+                    },
+                    "Right": {
+                      "Type": 18,
+                      "Value": 5,
+                      "Line": 3,
+                      "LinePos": 28,
+                      "File": "code.voc"
+                    }
+                  },
+                  "Operator": {
+                    "Type": 6,
+                    "Value": "-",
+                    "Line": 3,
+                    "LinePos": 29,
+                    "File": "code.voc"
+                  },
+                  "Right": {
+                    "Type": 18,
+                    "Value": 5,
+                    "Line": 3,
+                    "LinePos": 30,
                     "File": "code.voc"
                   }
                 }
@@ -2187,12 +2251,15 @@
             }
           },
           {
+            "Node": null
+          },
+          {
             "Node": {
               "Name": {
                 "Type": 20,
                 "Value": "print",
-                "Line": 26,
-                "LinePos": 40,
+                "Line": 27,
+                "LinePos": 9,
                 "File": "code.voc"
               },
               "Arguments": [
@@ -2200,8 +2267,8 @@
                   "Name": {
                     "Type": 20,
                     "Value": "IntToString",
-                    "Line": 26,
-                    "LinePos": 52,
+                    "Line": 27,
+                    "LinePos": 21,
                     "File": "code.voc"
                   },
                   "Arguments": [
@@ -2209,23 +2276,23 @@
                       "Name": {
                         "Type": 20,
                         "Value": "math.Add",
-                        "Line": 26,
-                        "LinePos": 61,
+                        "Line": 27,
+                        "LinePos": 30,
                         "File": "code.voc"
                       },
                       "Arguments": [
                         {
                           "Type": 18,
                           "Value": 5,
-                          "Line": 26,
-                          "LinePos": 63,
+                          "Line": 27,
+                          "LinePos": 32,
                           "File": "code.voc"
                         },
                         {
                           "Type": 18,
                           "Value": 5,
-                          "Line": 26,
-                          "LinePos": 66,
+                          "Line": 27,
+                          "LinePos": 35,
                           "File": "code.voc"
                         }
                       ]

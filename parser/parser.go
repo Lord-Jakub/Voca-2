@@ -73,16 +73,32 @@ func Parse(tokens []lexer.Token, Variables map[string]string) ([]ast.Statement, 
 				if tokens[i+2].Type == lexer.Equal {
 					var expression []lexer.Token
 					i += 3
+					for tokens[i].Type == lexer.OpenParen {
+						expression = append(expression, tokens[i])
+						i++
+					}
 					for lexer.IsOperator(tokens[i+1]) {
 						expression = append(expression, tokens[i])
 						expression = append(expression, tokens[i+1])
 						i += 2
+						for tokens[i].Type == lexer.OpenParen {
+							expression = append(expression, tokens[i])
+							i++
+						}
+						for tokens[i+1].Type == lexer.CloseParen {
+							expression = append(expression, tokens[i])
+							i++
+						}
 						if i+1 >= len(tokens) {
 							break
 						}
 					}
 					expression = append(expression, tokens[i])
-					value, IsNum, err := ParseExpression(expression, Variables)
+					for tokens[i].Type == lexer.CloseParen {
+						expression = append(expression, tokens[i])
+						i++
+					}
+					value, IsNum, err := ParseExpression(expression, Variables, false)
 					if err != nil {
 						return program.Statements, err
 					}
@@ -102,16 +118,32 @@ func Parse(tokens []lexer.Token, Variables map[string]string) ([]ast.Statement, 
 				if tokens[i+2].Type == lexer.Equal {
 					var expression []lexer.Token
 					i += 3
+					for tokens[i].Type == lexer.OpenParen {
+						expression = append(expression, tokens[i])
+						i++
+					}
 					for lexer.IsOperator(tokens[i+1]) {
 						expression = append(expression, tokens[i])
 						expression = append(expression, tokens[i+1])
 						i += 2
+						for tokens[i].Type == lexer.OpenParen {
+							expression = append(expression, tokens[i])
+							i++
+						}
+						for tokens[i+1].Type == lexer.CloseParen {
+							expression = append(expression, tokens[i])
+							i++
+						}
 						if i+1 >= len(tokens) {
 							break
 						}
 					}
 					expression = append(expression, tokens[i])
-					value, IsNum, err := ParseExpression(expression, Variables)
+					for tokens[i].Type == lexer.CloseParen {
+						expression = append(expression, tokens[i])
+						i++
+					}
+					value, IsNum, err := ParseExpression(expression, Variables, false)
 					if err != nil {
 						return program.Statements, err
 					}
@@ -242,7 +274,7 @@ func Parse(tokens []lexer.Token, Variables map[string]string) ([]ast.Statement, 
 					expression = append(expression, tokens[i])
 					i++
 				}
-				value, _, err := ParseExpression(expression, Variables)
+				value, _, err := ParseExpression(expression, Variables, false)
 				if err != nil {
 					return program.Statements, err
 				}
@@ -394,7 +426,7 @@ func Parse(tokens []lexer.Token, Variables map[string]string) ([]ast.Statement, 
 						if tokens[i].Type == lexer.Comma {
 							i++
 						}
-						arg, _, err := ParseExpression(expression, Variables)
+						arg, _, err := ParseExpression(expression, Variables, false)
 						if err != nil {
 							return program.Statements, err
 						}
@@ -444,7 +476,7 @@ func Parse(tokens []lexer.Token, Variables map[string]string) ([]ast.Statement, 
 						if tokens[i+1].Type == lexer.NewLine {
 							expression = append(expression, tokens[i])
 						}
-						value, IsNum, err := ParseExpression(expression, Variables)
+						value, IsNum, err := ParseExpression(expression, Variables, false)
 						if err != nil {
 							return program.Statements, err
 						}
@@ -519,10 +551,17 @@ func ParseBool(tokens []lexer.Token, Variables map[string]string) (ast.BoolExpre
 	for tokens[i].Type != lexer.DoubleEqual && tokens[i].Type != lexer.NotEqual && tokens[i].Type != lexer.LessThan && tokens[i].Type != lexer.MoreThan {
 		i++
 	}
+	tokens2 := make([]lexer.Token, 0)
+	j := 0
+	for j < len(tokens) {
+		tokens2 = append(tokens2, tokens[j])
+		j++
+	}
 
-	boolStatement.Condition1, _, err = ParseExpression(tokens[:i], Variables)
+	boolStatement.Condition1, _, err = ParseExpression(tokens[:i], Variables, false)
+	tokens = tokens2
 	boolStatement.Operator = tokens[i]
-	boolStatement.Condition2, _, err = ParseExpression(tokens[i+1:], Variables)
+	boolStatement.Condition2, _, err = ParseExpression(tokens[i+1:], Variables, false)
 	return boolStatement, err
 }
 
@@ -543,57 +582,338 @@ func IsNumber(token lexer.Token, Variables map[string]string) bool {
 		return false
 	}
 }
-func ParseExpression(tokens []lexer.Token, Variables map[string]string) (any, bool, error) {
-	var err error = nil
-	var expressionStatement ast.ExpressionStatement
+func AddParentheses(tokens []lexer.Token) []lexer.Token {
+	openParen := make([]lexer.Token, 1)
+	closeParen := make([]lexer.Token, 1)
+
+	openParen[0] = lexer.Token{Type: lexer.OpenParen, Value: "("}
+	closeParen[0] = lexer.Token{Type: lexer.CloseParen, Value: ")"}
+	//Divide
 	i := 0
-	hasPlusOrMinus := false
-	InFunc := 0
-	for i < len(tokens) {
-		if tokens[i].Type == lexer.OpenParen {
-			InFunc++
-		} else if tokens[i].Type == lexer.CloseParen {
-			InFunc--
+	for i+1 < len(tokens) {
+		for i < len(tokens) && tokens[i].Type != lexer.Divide {
+			i++
 		}
-		if (lexer.TokenType(tokens[i].Type) == lexer.Plus || lexer.TokenType(tokens[i].Type) == lexer.Minus) && InFunc == 0 {
-			hasPlusOrMinus = true
+		if i >= len(tokens) {
 			break
+		}
+		if tokens[i-1].Type != lexer.CloseParen {
+			tokens = append(tokens[:i-1], append(openParen, tokens[i-1:]...)...)
+			i++
+		} else {
+			j := i - 2
+			n := 1
+			for n > 0 {
+				if tokens[j].Type == lexer.CloseParen {
+					n++
+				} else if tokens[j].Type == lexer.OpenParen {
+					n--
+				}
+				j--
+			}
+			j++
+
+			if _, exist := Functions[tokens[i].Value.(string)]; exist {
+				j--
+				tokens = append(tokens[:j], append(openParen, tokens[j:]...)...)
+				i++
+			} else {
+				tokens = append(tokens[:j], append(openParen, tokens[j:]...)...)
+				i++
+			}
+		}
+		if tokens[i+1].Type != lexer.OpenParen {
+			tokens = append(tokens[:i+2], append(closeParen, tokens[i+2:]...)...)
+
+		} else {
+			j := i + 2
+			n := 1
+			for n > 0 {
+				if tokens[j].Type == lexer.CloseParen {
+					n--
+				} else if tokens[j].Type == lexer.OpenParen {
+					n++
+				}
+				j++
+			}
+			j--
+			tokens = append(tokens[:j], append(closeParen, tokens[j:]...)...)
+
+		}
+		i++
+	}
+	//Multiply
+	i = 0
+	for i+1 < len(tokens) {
+		for i < len(tokens) && tokens[i].Type != lexer.Multiply {
+			i++
+		}
+		if i >= len(tokens) {
+			break
+		}
+		if tokens[i-1].Type != lexer.CloseParen {
+			tokens = append(tokens[:i-1], append(openParen, tokens[i-1:]...)...)
+			i++
+		} else {
+			j := i - 2
+			n := 1
+			for n > 0 {
+				if tokens[j].Type == lexer.CloseParen {
+					n++
+				} else if tokens[j].Type == lexer.OpenParen {
+					n--
+				}
+				j--
+			}
+			j++
+			if _, exist := Functions[tokens[i].Value.(string)]; exist {
+				j--
+				tokens = append(tokens[:j], append(openParen, tokens[j:]...)...)
+				i++
+			} else {
+				tokens = append(tokens[:j], append(openParen, tokens[j:]...)...)
+				i++
+			}
+		}
+		if tokens[i+1].Type != lexer.OpenParen {
+			tokens = append(tokens[:i+2], append(closeParen, tokens[i+2:]...)...)
+
+		} else {
+			j := i + 2
+			n := 1
+			for n > 0 {
+				if tokens[j].Type == lexer.CloseParen {
+					n--
+				} else if tokens[j].Type == lexer.OpenParen {
+					n++
+				}
+				j++
+			}
+			j--
+			tokens = append(tokens[:j], append(closeParen, tokens[j:]...)...)
+
 		}
 		i++
 	}
 	i = 0
-	if IsNumber(tokens[i], Variables) {
-		if hasPlusOrMinus {
-			for lexer.TokenType(tokens[i].Type) != lexer.Plus && lexer.TokenType(tokens[i].Type) != lexer.Minus {
+	//Sub
+	for i+1 < len(tokens) {
+		for i < len(tokens) && tokens[i].Type != lexer.Minus {
+			i++
+		}
+		if i >= len(tokens) {
+			break
+		}
+		if tokens[i-1].Type != lexer.CloseParen {
+			tokens = append(tokens[:i-1], append(openParen, tokens[i-1:]...)...)
+			i++
+		} else {
+			j := i - 2
+			n := 1
+			for n > 0 {
+				if tokens[j].Type == lexer.CloseParen {
+					n++
+				} else if tokens[j].Type == lexer.OpenParen {
+					n--
+				}
+				j--
+			}
+			j++
+			if _, exist := Functions[tokens[i].Value.(string)]; exist {
+				j--
+				tokens = append(tokens[:j], append(openParen, tokens[j:]...)...)
+				i++
+			} else {
+				tokens = append(tokens[:j], append(openParen, tokens[j:]...)...)
 				i++
 			}
-			expressionStatement.Left, _, err = ParseExpression(tokens[:i], Variables)
-			expressionStatement.Operator = tokens[i]
-			expressionStatement.Right, _, err = ParseExpression(tokens[i+1:], Variables)
+		}
+		if tokens[i+1].Type != lexer.OpenParen {
+			tokens = append(tokens[:i+2], append(closeParen, tokens[i+2:]...)...)
+
 		} else {
-			if len(tokens) > 1 {
-				op := 1
+			j := i + 2
+			n := 1
+			for n > 0 {
+				if tokens[j].Type == lexer.CloseParen {
+					n--
+				} else if tokens[j].Type == lexer.OpenParen {
+					n++
+				}
+				j++
+			}
+			j--
+			tokens = append(tokens[:j], append(closeParen, tokens[j:]...)...)
+
+		}
+		i++
+	}
+	i = 0
+	//Add
+	for i+1 < len(tokens) {
+		for i < len(tokens) && tokens[i].Type != lexer.Plus {
+			i++
+		}
+		if i >= len(tokens) {
+			break
+		}
+		if tokens[i-1].Type != lexer.CloseParen {
+			tokens = append(tokens[:i-1], append(openParen, tokens[i-1:]...)...)
+			i++
+		} else {
+			j := i - 2
+			n := 1
+			for n > 0 {
+				if tokens[j].Type == lexer.CloseParen {
+					n++
+				} else if tokens[j].Type == lexer.OpenParen {
+					n--
+				}
+				j--
+			}
+			j++
+			if _, exist := Functions[tokens[i].Value.(string)]; exist {
+				j--
+				tokens = append(tokens[:j], append(openParen, tokens[j:]...)...)
+				i++
+			} else {
+				tokens = append(tokens[:j], append(openParen, tokens[j:]...)...)
+				i++
+			}
+		}
+		if tokens[i+1].Type != lexer.OpenParen {
+			tokens = append(tokens[:i+2], append(closeParen, tokens[i+2:]...)...)
+
+		} else {
+			j := i + 2
+			n := 1
+			for n > 0 {
+
+				if tokens[j].Type == lexer.CloseParen {
+					n--
+				} else if tokens[j].Type == lexer.OpenParen {
+					n++
+				}
+				j++
+			}
+			j--
+			tokens = append(tokens[:j], append(closeParen, tokens[j:]...)...)
+
+		}
+		i++
+	}
+
+	return tokens
+}
+func ParseExpression(express []lexer.Token, Variables map[string]string, parentheses bool) (any, bool, error) {
+	var err error = nil
+	var expressionStatement ast.ExpressionStatement
+	i := 0
+	//hasPlusOrMinus := false
+	/*InFunc := 0
+	for i < len(express) {
+		if express[i].Type == lexer.OpenParen {
+			InFunc++
+		} else if express[i].Type == lexer.CloseParen {
+			InFunc--
+		}
+		if (lexer.TokenType(express[i].Type) == lexer.Plus || lexer.TokenType(express[i].Type) == lexer.Minus) && InFunc == 0 {
+			hasPlusOrMinus = true
+			break
+		}
+		i++
+	}*/
+	i = 0
+	for i < len(express) && (express[i].Type == lexer.OpenParen || lexer.IsOperator(express[i])) {
+		i++
+	}
+	if IsNumber(express[i], Variables) {
+		if !parentheses {
+			express = AddParentheses(express)
+		}
+		i = 0
+		if express[i].Type == lexer.OpenParen {
+			i++
+			if express[i].Type == lexer.OpenParen {
+				i++
+				n := 1
+				for n > 0 {
+					if express[i].Type == lexer.OpenParen {
+						n++
+					} else if express[i].Type == lexer.CloseParen {
+						n--
+					}
+					i++
+				}
+				if express[i].Type != lexer.CloseParen {
+					expressionStatement.Left, _, err = ParseExpression(express[1:i], Variables, true)
+					expressionStatement.Operator = express[i]
+					if express[i+1].Type == lexer.OpenParen {
+						expressionStatement.Right, _, err = ParseExpression(express[i+1:len(express)-1], Variables, true)
+					} else {
+						var funcCall ast.FuncCall
+						var fname string
+						switch express[i].Value.(type) {
+						case string:
+							fname = express[i].Value.(string)
+						case int:
+							fname = strconv.Itoa(express[i].Value.(int))
+						}
+						if _, exist := Functions[fname]; exist && express[i].Type == lexer.Identifier {
+
+							funcCall.Name = express[i]
+							funcCall.Arguments = make([]any, i)
+							i += 2
+							for express[i].Type != lexer.CloseParen && express[i].Type != lexer.NewLine {
+								var expression []lexer.Token
+
+								expression, i = getArgs(express, i, Variables, false)
+								if express[i].Type == lexer.Comma {
+									i++
+								}
+								arg, _, err := ParseExpression(expression, Variables, true)
+								if err != nil {
+									return expressionStatement, true, err
+								}
+								funcCall.Arguments = append(funcCall.Arguments, arg)
+								if err != nil {
+									return expressionStatement, true, err
+								}
+							}
+
+							expressionStatement.Right = funcCall
+						} else {
+							i++
+							expressionStatement.Right = express[i]
+
+						}
+					}
+				} else {
+					return ParseExpression(express[1:len(express)-1], Variables, true)
+				}
+
+			} else {
 				var funcCall ast.FuncCall
 				var fname string
-				switch tokens[0].Value.(type) {
+				switch express[i].Value.(type) {
 				case string:
-					fname = tokens[0].Value.(string)
+					fname = express[i].Value.(string)
 				case int:
-					fname = strconv.Itoa(tokens[0].Value.(int))
+					fname = strconv.Itoa(express[i].Value.(int))
 				}
-				if _, exist := Functions[fname]; exist && tokens[0].Type == lexer.Identifier {
+				if _, exist := Functions[fname]; exist && express[i].Type == lexer.Identifier {
 
-					funcCall.Name = tokens[0]
-					funcCall.Arguments = make([]any, 0)
+					funcCall.Name = express[i]
+					funcCall.Arguments = make([]any, i)
 					i += 2
-					for tokens[i].Type != lexer.CloseParen && tokens[i].Type != lexer.NewLine {
+					for express[i].Type != lexer.CloseParen && express[i].Type != lexer.NewLine {
 						var expression []lexer.Token
 
-						expression, i = getArgs(tokens, i, Variables, false)
-						if tokens[i].Type == lexer.Comma {
+						expression, i = getArgs(express, i, Variables, false)
+						if express[i].Type == lexer.Comma {
 							i++
 						}
-						arg, _, err := ParseExpression(expression, Variables)
+						arg, _, err := ParseExpression(expression, Variables, true)
 						if err != nil {
 							return expressionStatement, true, err
 						}
@@ -602,81 +922,208 @@ func ParseExpression(tokens []lexer.Token, Variables map[string]string) (any, bo
 							return expressionStatement, true, err
 						}
 					}
+
 					expressionStatement.Left = funcCall
-					op = i + 1
 				} else {
-					expressionStatement.Left = tokens[0]
-				}
-				if len(tokens) <= op {
-					return funcCall, true, err
+					expressionStatement.Left = express[i]
 
 				}
-				expressionStatement.Operator = tokens[op]
-				expressionStatement.Right, _, err = ParseExpression(tokens[op+1:], Variables)
-			} else {
-				var ret any
-				var fname string
-				switch tokens[0].Value.(type) {
-				case string:
-					fname = tokens[0].Value.(string)
-				case int:
-					fname = strconv.Itoa(tokens[0].Value.(int))
-				}
-				if _, exist := Functions[fname]; exist && tokens[0].Type == lexer.Identifier {
+				i++
+				expressionStatement.Operator = express[i]
+				if express[i+1].Type == lexer.OpenParen {
+					expressionStatement.Right, _, err = ParseExpression(express[i+1:len(express)-1], Variables, true)
+				} else {
+					i++
 					var funcCall ast.FuncCall
-					funcCall.Name = tokens[0]
-					funcCall.Arguments = make([]any, 0)
-					i += 2
-					for tokens[i].Type != lexer.CloseParen && tokens[i].Type != lexer.NewLine {
-						var expression []lexer.Token
-
-						expression, i = getArgs(tokens, i, Variables, false)
-						if tokens[i].Type == lexer.Comma {
-							i++
-						}
-						arg, _, err := ParseExpression(expression, Variables)
-						if err != nil {
-							return expressionStatement, true, err
-						}
-						funcCall.Arguments = append(funcCall.Arguments, arg)
-						if err != nil {
-							return expressionStatement, true, err
-						}
+					var fname string
+					switch express[i].Value.(type) {
+					case string:
+						fname = express[i].Value.(string)
+					case int:
+						fname = strconv.Itoa(express[i].Value.(int))
 					}
-					ret = funcCall
-				} else {
-					ret = tokens[0]
+					if _, exist := Functions[fname]; exist && express[i].Type == lexer.Identifier {
+
+						funcCall.Name = express[i]
+						funcCall.Arguments = make([]any, i)
+						i += 2
+						for express[i].Type != lexer.CloseParen && express[i].Type != lexer.NewLine {
+							var expression []lexer.Token
+
+							expression, i = getArgs(express, i, Variables, false)
+							if express[i].Type == lexer.Comma {
+								i++
+							}
+							arg, _, err := ParseExpression(expression, Variables, true)
+							if err != nil {
+								return expressionStatement, true, err
+							}
+							funcCall.Arguments = append(funcCall.Arguments, arg)
+							if err != nil {
+								return expressionStatement, true, err
+							}
+						}
+
+						expressionStatement.Right = funcCall
+					} else {
+						expressionStatement.Right = express[i]
+					}
+
 				}
 
-				return ret, true, err
+			}
+
+			/*if hasPlusOrMinus {
+				for lexer.TokenType(express[i].Type) != lexer.Plus && lexer.TokenType(express[i].Type) != lexer.Minus {
+					i++
+				}
+				expressionStatement.Left, _, err = ParseExpression(express[:i], Variables)
+				expressionStatement.Operator = express[i]
+				expressionStatement.Right, _, err = ParseExpression(express[i+1:], Variables)
+			} else {
+				if len(express) > 1 {
+					op := 1
+					var funcCall ast.FuncCall
+					var fname string
+					switch express[0].Value.(type) {
+					case string:
+						fname = express[0].Value.(string)
+					case int:
+						fname = strconv.Itoa(express[0].Value.(int))
+					}
+					if _, exist := Functions[fname]; exist && express[0].Type == lexer.Identifier {
+
+						funcCall.Name = express[0]
+						funcCall.Arguments = make([]any, 0)
+						i += 2
+						for express[i].Type != lexer.CloseParen && express[i].Type != lexer.NewLine {
+							var expression []lexer.Token
+
+							expression, i = getArgs(express, i, Variables, false)
+							if express[i].Type == lexer.Comma {
+								i++
+							}
+							arg, _, err := ParseExpression(expression, Variables)
+							if err != nil {
+								return expressionStatement, true, err
+							}
+							funcCall.Arguments = append(funcCall.Arguments, arg)
+							if err != nil {
+								return expressionStatement, true, err
+							}
+						}
+						expressionStatement.Left = funcCall
+						op = i + 1
+					} else {
+						expressionStatement.Left = express[0]
+					}
+					if len(express) <= op {
+						return funcCall, true, err
+
+					}
+					expressionStatement.Operator = express[op]
+					expressionStatement.Right, _, err = ParseExpression(express[op+1:], Variables)
+				} else {
+					var ret any
+					var fname string
+					switch express[0].Value.(type) {
+					case string:
+						fname = express[0].Value.(string)
+					case int:
+						fname = strconv.Itoa(express[0].Value.(int))
+					}
+					if _, exist := Functions[fname]; exist && express[0].Type == lexer.Identifier {
+						var funcCall ast.FuncCall
+						funcCall.Name = express[0]
+						funcCall.Arguments = make([]any, 0)
+						i += 2
+						for express[i].Type != lexer.CloseParen && express[i].Type != lexer.NewLine {
+							var expression []lexer.Token
+
+							expression, i = getArgs(express, i, Variables, false)
+							if express[i].Type == lexer.Comma {
+								i++
+							}
+							arg, _, err := ParseExpression(expression, Variables)
+							if err != nil {
+								return expressionStatement, true, err
+							}
+							funcCall.Arguments = append(funcCall.Arguments, arg)
+							if err != nil {
+								return expressionStatement, true, err
+							}
+						}
+						ret = funcCall
+					} else {
+						ret = express[0]
+					}
+
+					return ret, true, err
+				}
+			}*/
+		} else {
+			var funcCall ast.FuncCall
+			var fname string
+			switch express[i].Value.(type) {
+			case string:
+				fname = express[i].Value.(string)
+			case int:
+				fname = strconv.Itoa(express[i].Value.(int))
+			}
+			if _, exist := Functions[fname]; exist && express[i].Type == lexer.Identifier {
+
+				funcCall.Name = express[i]
+				funcCall.Arguments = make([]any, i)
+				i += 2
+				for express[i].Type != lexer.CloseParen && express[i].Type != lexer.NewLine {
+					var expression []lexer.Token
+
+					expression, i = getArgs(express, i, Variables, false)
+					if express[i].Type == lexer.Comma {
+						i++
+					}
+					arg, _, err := ParseExpression(expression, Variables, true)
+					if err != nil {
+						return expressionStatement, true, err
+					}
+					funcCall.Arguments = append(funcCall.Arguments, arg)
+					if err != nil {
+						return expressionStatement, true, err
+					}
+				}
+
+				return funcCall, true, err
+			} else {
+				return express[i], true, err
 			}
 		}
 		return expressionStatement, true, err
 	} else {
-		if len(tokens) > 1 {
+		i = 0
+		if len(express) > 1 {
 			op := 1
 			var funcCall ast.FuncCall
 			var fname string
-			switch tokens[0].Value.(type) {
+			switch express[0].Value.(type) {
 			case string:
-				fname = tokens[0].Value.(string)
+				fname = express[0].Value.(string)
 			case int:
-				fname = strconv.Itoa(tokens[0].Value.(int))
+				fname = strconv.Itoa(express[0].Value.(int))
 			}
-			if _, exist := Functions[fname]; exist && tokens[0].Type == lexer.Identifier {
+			if _, exist := Functions[fname]; exist && express[0].Type == lexer.Identifier {
 
-				funcCall.Name = tokens[0]
+				funcCall.Name = express[0]
 				funcCall.Arguments = make([]any, 0)
 				i += 2
-				for tokens[i].Type != lexer.CloseParen && tokens[i].Type != lexer.NewLine {
+				for express[i].Type != lexer.CloseParen && express[i].Type != lexer.NewLine {
 					var expression []lexer.Token
 
-					expression, i = getArgs(tokens, i, Variables, false)
+					expression, i = getArgs(express, i, Variables, false)
 
-					if tokens[i].Type == lexer.Comma {
+					if express[i].Type == lexer.Comma {
 						i++
 					}
-					arg, _, err := ParseExpression(expression, Variables)
+					arg, _, err := ParseExpression(expression, Variables, true)
 					if err != nil {
 						return expressionStatement, true, err
 					}
@@ -688,39 +1135,39 @@ func ParseExpression(tokens []lexer.Token, Variables map[string]string) (any, bo
 				op = i + 1
 				expressionStatement.Left = funcCall
 			} else {
-				expressionStatement.Left = tokens[0]
+				expressionStatement.Left = express[0]
 			}
-			if len(tokens) <= op {
+			if len(express) <= op {
 				return funcCall, false, err
 
 			}
-			expressionStatement.Operator = tokens[op]
-			expressionStatement.Right, _, err = ParseExpression(tokens[op+1:], Variables)
+			expressionStatement.Operator = express[op]
+			expressionStatement.Right, _, err = ParseExpression(express[op+1:], Variables, true)
 			if expressionStatement.Operator.Type != lexer.Plus {
 				err = errors.New(fmt.Sprintf("Expected '+' on line: %d at position %d, not '%s' in file '%s'", expressionStatement.Operator.Line, expressionStatement.Operator.LinePos, expressionStatement.Operator.Value, expressionStatement.Operator.File))
 			}
 		} else {
 			var ret any
 			var fname string
-			switch tokens[0].Value.(type) {
+			switch express[0].Value.(type) {
 			case string:
-				fname = tokens[0].Value.(string)
+				fname = express[0].Value.(string)
 			case int:
-				fname = strconv.Itoa(tokens[0].Value.(int))
+				fname = strconv.Itoa(express[0].Value.(int))
 			}
-			if _, exist := Functions[fname]; exist && tokens[0].Type == lexer.Identifier {
+			if _, exist := Functions[fname]; exist && express[0].Type == lexer.Identifier {
 				var funcCall ast.FuncCall
-				funcCall.Name = tokens[0]
+				funcCall.Name = express[0]
 				funcCall.Arguments = make([]any, 0)
 				i += 2
-				for tokens[i].Type != lexer.CloseParen {
+				for express[i].Type != lexer.CloseParen {
 					var expression []lexer.Token
 
-					expression, i = getArgs(tokens, i, Variables, false)
-					if tokens[i].Type == lexer.Comma {
+					expression, i = getArgs(express, i, Variables, false)
+					if express[i].Type == lexer.Comma {
 						i++
 					}
-					arg, _, err := ParseExpression(expression, Variables)
+					arg, _, err := ParseExpression(expression, Variables, true)
 					if err != nil {
 						return expressionStatement, false, err
 					}
@@ -731,7 +1178,7 @@ func ParseExpression(tokens []lexer.Token, Variables map[string]string) (any, bo
 				}
 				ret = funcCall
 			} else {
-				ret = tokens[0]
+				ret = express[0]
 			}
 
 			return ret, false, err
