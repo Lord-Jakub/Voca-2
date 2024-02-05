@@ -1,0 +1,32 @@
+import "graphics"
+func main(){
+    int init = graphics.Init() 
+    graphics.CreateWindow("Voca game", 800, 600)
+   int x = 10
+   int y = 10
+   
+    while (graphics.IsRunning()) {
+        graphics.SetColor(255, 255, 255, 255)
+        graphics.Clear()
+        graphics.SetColor(255, 0, 0, 255)
+        graphics.CreatePicture("player.png",x, y, 64, 64)
+      
+        if (graphics.KeyPressed("W")) {
+            y = y-2
+        }
+         if (graphics.KeyPressed("S")) {
+            y = y+2
+        }
+         if (graphics.KeyPressed("D")) {
+            x = x+2
+        }
+         if (graphics.KeyPressed("A")) {
+            x = x-2
+        }
+        graphics.Update()
+        delay(1000/60)
+    
+    }
+    print("Closing app")
+   graphics.Close()
+}

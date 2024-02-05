@@ -1,0 +1,88 @@
+external "graphics"
+extern_func gInit() int
+extern_func gCreateWindow(string title, int w,  int h) int
+extern_func gSetColor(int r, int g, int b, int a) 
+extern_func gClear() 
+extern_func gClose() 
+extern_func gQuit() 
+extern_func gCreateFillRect(int x, int y, int w, int h) 
+extern_func gUpdate() 
+extern_func gCreateRect(int x, int y, int w, int h) 
+extern_func gCreateLine(int x1, int y1, int x2, int y2) 
+extern_func gCreateCircle(int x, int y, int r)
+extern_func gCreatePoint(int x, int y)
+extern_func gCreatePicture(string path, int x, int y, int w, int h)
+extern_func gKeyPressed(string keyName) bool
+extern_func gMouseDown(string button) bool
+extern_func gMouseX() int
+extern_func gMouseY() int
+extern_func gIsRunning() bool
+func Init() int{
+    return gInit()
+}
+func CreateWindow(string title, int w,  int h){
+    gCreateWindow(title, w,  h)
+}
+func SetColor(int r, int g, int b, int a) {
+    gSetColor(r, g, b, a)
+}
+
+func Clear() {
+     gClear()
+}
+
+func Close() {
+     gClose()
+}
+
+func Quit() {
+     gQuit()
+}
+
+func CreateFillRect(int x, int y, int w, int h) {
+     gCreateFillRect(x, y, w, h)
+}
+
+func Update() {
+     gUpdate()
+}
+
+func CreateRect(int x, int y, int w, int h) {
+     gCreateRect(x, y, w, h)
+}
+
+func CreateLine(int x1, int y1, int x2, int y2) {
+     gCreateLine(x1, y1, x2, y2)
+}
+
+func CreateCircle(int x, int y, int r) {
+     gCreateCircle(x, y, r)
+}
+
+func CreatePoint(int x, int y) {
+     gCreatePoint(x, y)
+}
+
+func CreatePicture(string path, int x, int y, int w, int h) {
+     gCreatePicture(path, x, y, w, h)
+}
+
+func KeyPressed(string keyName) bool {
+    return gKeyPressed(keyName)
+}
+
+func MouseDown(string button) bool {
+    return gMouseDown(button)
+}
+
+func MouseX() int {
+    return gMouseX()
+}
+
+func MouseY() int {
+    return gMouseY()
+}
+
+func IsRunning() bool {
+    return gIsRunning()
+}

@@ -1,6 +1,8 @@
 import "math"
 func main(){
     int i = (5+5)*3+5+15-5-5-5
+    float f = 5.5*5.3+5.5*5.5
+    print(FloatToString(f))
     while i>0{
         print(IntToString(i))
         i--
@@ -25,4 +27,6 @@ func main(){
     }
   
     print(IntToString(math.Add(5, 5)))
+    print("Zadej neco: ")
+    print("Zadal jsi: " + Read())
 }

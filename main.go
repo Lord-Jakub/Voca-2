@@ -10,6 +10,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"strconv"
 	"strings"
 )
 
@@ -92,8 +93,21 @@ func os_var(program compiler.Program, i int) (compiler.Program, int) {
 	}
 	return program, i
 }
+func Optimalisation(program compiler.Program, i int) (compiler.Program, int) {
+	if i+1 < len(program.Args) {
+		program.Optimalisation, _ = strconv.Atoi(program.Args[i+1])
+		if program.Optimalisation < 0 || program.Optimalisation > 3 {
+			lib.Print("Optimalisation must be in range 0-3")
+			os.Exit(1)
+		}
+		i++
+	} else {
+		lib.Print("No optimalisation specified")
+	}
+	return program, i
+}
 func main() {
-	program := compiler.Program{Args: os.Args, GenerateAST: false, File: "main.voc", LoadAST: false, Ir: false, Obj: false, Exec: true}
+	program := compiler.Program{Args: os.Args, GenerateAST: false, File: "main.voc", LoadAST: false, Ir: false, Obj: false, Exec: true, Optimalisation: 0}
 	if len(program.Args) >= 1 {
 		i := 0
 		for i < len(program.Args) {
@@ -127,6 +141,8 @@ func main() {
 			case "-c":
 				program.Obj = true
 				program.Exec = false
+			case "-O":
+				program, i = Optimalisation(program, i)
 
 			}
 			i++

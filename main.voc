@@ -1,28 +1,19 @@
-import "math"
+import "graphics"
 func main(){
-    int i = (5+5)*3+5+15-5-5-5
-    while i>0{
-        print(IntToString(i))
-        i--
+    int init = graphics.Init() 
+    graphics.CreateWindow("SDL Demo", 800, 600)
+   
+    while (graphics.IsRunning()) {
+        graphics.SetColor(255, 255, 255, 255)
+        graphics.Clear()
+        graphics.SetColor(255, 0, 0, 255)
+        graphics.CreateFillRect(100, 100, 200, 200)
+        if (graphics.MouseDown("left")) {
+            graphics.SetColor(0, 255, 0, 255)
+            graphics.CreatePoint(graphics.MouseX(), graphics.MouseY())
+        }
+        graphics.Update()
+    
     }
-    bool b = true
-    string s = "Ahoj"
-    string s2 = " Svete"
-    string s3 = s+s2
-    print(s3)
-   if 5+5 < 11{
-        print("Ano")
-    } else {
-        print("Ne")
-    }
-    if 5==5{
-        print("Ahoj")
-    }
-    if !b{
-        print("false")
-    } else {
-        print("true")
-    }
-  
-    print(IntToString(math.Add(5, 5)))
+   graphics.Close()
 }

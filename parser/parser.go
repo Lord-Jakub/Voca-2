@@ -36,19 +36,35 @@ func MapFunctions(tokens []lexer.Token) (map[string]string, error) {
 	functions["append"] = "string"
 	functions["strlen"] = "int"
 	functions["IntToString"] = "string"
+	functions["Read"] = "string"
+	functions["StringToFloat"] = "float"
+	functions["StringToInt"] = "int"
+	functions["FloatToString"] = "string"
+	functions["FloatToInt"] = "int"
+	functions["delay"] = "void"
 	for i := 0; i < len(tokens); i++ {
 		if tokens[i].Type == lexer.Keyword && tokens[i].Value == "func" {
 			name := tokens[i+1].Value
 			for tokens[i].Type != lexer.OpenBrace {
 				i++
 			}
-			functions[name.(string)] = tokens[i-1].Value.(string)
+			if tokens[i-1].Value == ")" {
+				functions[name.(string)] = "void"
+
+			} else {
+				functions[name.(string)] = tokens[i-1].Value.(string)
+			}
 		} else if tokens[i].Type == lexer.Keyword && tokens[i].Value == "extern_func" {
 			name := tokens[i+1].Value
-			for tokens[i].Type != lexer.OpenBrace {
+			for tokens[i].Type != lexer.CloseParen {
 				i++
 			}
-			functions[name.(string)] = tokens[i-1].Value.(string)
+			i++
+			if tokens[i].Value == "string" || tokens[i].Value == "int" || tokens[i].Value == "float" || tokens[i].Value == "bool" {
+				functions[name.(string)] = tokens[i].Value.(string)
+			} else {
+				functions[name.(string)] = "void"
+			}
 		}
 	}
 	return functions, nil
@@ -59,14 +75,19 @@ func Parse(tokens []lexer.Token, Variables map[string]string) ([]ast.Statement, 
 	program.Statements = append(program.Statements, ast.Statement{Node: ast.ExternFuncDeclaration{Name: lexer.Token{Type: lexer.Keyword, Value: "append"}, Arguments: []any{ast.VariableDeclaration{Type: lexer.Token{Type: lexer.Keyword, Value: "string"}, Name: lexer.Token{Type: lexer.Identifier, Value: "s1"}}, ast.VariableDeclaration{Type: lexer.Token{Type: lexer.Keyword, Value: "string"}, Name: lexer.Token{Type: lexer.Identifier, Value: "s2"}}}, Type: lexer.Token{Type: lexer.Keyword, Value: "string"}}})
 	program.Statements = append(program.Statements, ast.Statement{Node: ast.ExternFuncDeclaration{Name: lexer.Token{Type: lexer.Keyword, Value: "strlen"}, Arguments: []any{ast.VariableDeclaration{Type: lexer.Token{Type: lexer.Keyword, Value: "string"}, Name: lexer.Token{Type: lexer.Identifier, Value: "s"}}}, Type: lexer.Token{Type: lexer.Keyword, Value: "int"}}})
 	program.Statements = append(program.Statements, ast.Statement{Node: ast.ExternFuncDeclaration{Name: lexer.Token{Type: lexer.Keyword, Value: "IntToString"}, Arguments: []any{ast.VariableDeclaration{Type: lexer.Token{Type: lexer.Keyword, Value: "int"}, Name: lexer.Token{Type: lexer.Identifier, Value: "num"}}}, Type: lexer.Token{Type: lexer.Keyword, Value: "string"}}})
-
+	program.Statements = append(program.Statements, ast.Statement{Node: ast.ExternFuncDeclaration{Name: lexer.Token{Type: lexer.Keyword, Value: "Read"}, Arguments: []any{}, Type: lexer.Token{Type: lexer.Keyword, Value: "string"}}})
+	program.Statements = append(program.Statements, ast.Statement{Node: ast.ExternFuncDeclaration{Name: lexer.Token{Type: lexer.Keyword, Value: "StringToFloat"}, Arguments: []any{ast.VariableDeclaration{Type: lexer.Token{Type: lexer.Keyword, Value: "string"}, Name: lexer.Token{Type: lexer.Identifier, Value: "s"}}}, Type: lexer.Token{Type: lexer.Keyword, Value: "float"}}})
+	program.Statements = append(program.Statements, ast.Statement{Node: ast.ExternFuncDeclaration{Name: lexer.Token{Type: lexer.Keyword, Value: "StringToInt"}, Arguments: []any{ast.VariableDeclaration{Type: lexer.Token{Type: lexer.Keyword, Value: "string"}, Name: lexer.Token{Type: lexer.Identifier, Value: "s"}}}, Type: lexer.Token{Type: lexer.Keyword, Value: "int"}}})
+	program.Statements = append(program.Statements, ast.Statement{Node: ast.ExternFuncDeclaration{Name: lexer.Token{Type: lexer.Keyword, Value: "FloatToString"}, Arguments: []any{ast.VariableDeclaration{Type: lexer.Token{Type: lexer.Keyword, Value: "float"}, Name: lexer.Token{Type: lexer.Identifier, Value: "f"}}}, Type: lexer.Token{Type: lexer.Keyword, Value: "string"}}})
+	program.Statements = append(program.Statements, ast.Statement{Node: ast.ExternFuncDeclaration{Name: lexer.Token{Type: lexer.Keyword, Value: "FloatToInt"}, Arguments: []any{ast.VariableDeclaration{Type: lexer.Token{Type: lexer.Keyword, Value: "float"}, Name: lexer.Token{Type: lexer.Identifier, Value: "f"}}}, Type: lexer.Token{Type: lexer.Keyword, Value: "int"}}})
+	program.Statements = append(program.Statements, ast.Statement{Node: ast.ExternFuncDeclaration{Name: lexer.Token{Type: lexer.Keyword, Value: "delay"}, Arguments: []any{ast.VariableDeclaration{Type: lexer.Token{Type: lexer.Keyword, Value: "int"}, Name: lexer.Token{Type: lexer.Identifier, Value: "ms"}}}, Type: lexer.Token{Type: lexer.Keyword, Value: "void"}}})
 	var err error = nil
 	for i := 0; i < len(tokens); i++ {
 		var statement ast.Statement
 		switch tokens[i].Type {
 		case lexer.Keyword:
 			switch tokens[i].Value {
-			case "int":
+			case "int", "float":
 				var variableDeclaration ast.VariableDeclaration
 				variableDeclaration.Type = tokens[i]
 				variableDeclaration.Name = tokens[i+1]
@@ -77,7 +98,7 @@ func Parse(tokens []lexer.Token, Variables map[string]string) ([]ast.Statement, 
 						expression = append(expression, tokens[i])
 						i++
 					}
-					for lexer.IsOperator(tokens[i+1]) {
+					for lexer.IsOperator(tokens[i+1]) || tokens[i+1].Type == lexer.OpenParen {
 						expression = append(expression, tokens[i])
 						expression = append(expression, tokens[i+1])
 						i += 2
@@ -94,6 +115,7 @@ func Parse(tokens []lexer.Token, Variables map[string]string) ([]ast.Statement, 
 						}
 					}
 					expression = append(expression, tokens[i])
+					i++
 					for tokens[i].Type == lexer.CloseParen {
 						expression = append(expression, tokens[i])
 						i++
@@ -110,7 +132,11 @@ func Parse(tokens []lexer.Token, Variables map[string]string) ([]ast.Statement, 
 					}
 				}
 				statement.Node = variableDeclaration
-				Variables[variableDeclaration.Name.Value.(string)] = "int"
+				if variableDeclaration.Type.Value == "int" {
+					Variables[variableDeclaration.Name.Value.(string)] = "int"
+				} else {
+					Variables[variableDeclaration.Name.Value.(string)] = "float"
+				}
 			case "string":
 				var variableDeclaration ast.VariableDeclaration
 				variableDeclaration.Type = tokens[i]
@@ -219,7 +245,13 @@ func Parse(tokens []lexer.Token, Variables map[string]string) ([]ast.Statement, 
 					bodyTokens = append(bodyTokens, tokens[i])
 					i++
 				}
-				funcDeclaration.Body, err = Parse(bodyTokens, make(map[string]string))
+				variables := make(map[string]string)
+				i2 := 0
+				for i2 < len(funcDeclaration.Arguments) {
+					variables[funcDeclaration.Arguments[i2].(ast.VariableDeclaration).Name.Value.(string)] = funcDeclaration.Arguments[i2].(ast.VariableDeclaration).Type.Value.(string)
+					i2++
+				}
+				funcDeclaration.Body, err = Parse(bodyTokens, variables)
 				if err != nil {
 					return program.Statements, err
 				}
@@ -301,11 +333,37 @@ func Parse(tokens []lexer.Token, Variables map[string]string) ([]ast.Statement, 
 					}
 					i++
 				}
+				i2++
 				if isexpression {
 					condition, err = ParseBool(expression, Variables)
 				} else if tokens[i2].Type == lexer.Identifier {
 					if Variables[tokens[i2].Value.(string)] == "bool" {
 						condition = tokens[i2]
+					} else if Functions[tokens[i2].Value.(string)] == "bool" {
+						var funcCall ast.FuncCall
+						funcCall.Name = tokens[i2]
+						funcCall.Arguments = make([]any, 0)
+						i2 += 2
+						for tokens[i2].Type != lexer.CloseParen && tokens[i2].Type != lexer.NewLine {
+							var expression []lexer.Token
+
+							expression, i2 = getArgs(tokens, i2, Variables, false)
+
+							if tokens[i2].Type == lexer.Comma {
+								i2++
+							}
+							arg, _, err := ParseExpression(expression, Variables, false)
+							if err != nil {
+								return program.Statements, err
+							}
+
+							funcCall.Arguments = append(funcCall.Arguments, arg)
+							if err != nil {
+								return program.Statements, err
+							}
+						}
+						condition = funcCall
+
 					} else {
 						err = errors.New(fmt.Sprintf("Expected bool on line: %d at position %d, not '%s' in file: '%s'", tokens[i2].Line, tokens[i2].LinePos, tokens[i2].Value, tokens[i2].File))
 					}
@@ -373,11 +431,37 @@ func Parse(tokens []lexer.Token, Variables map[string]string) ([]ast.Statement, 
 					}
 					i++
 				}
+				i2++
 				if isexpression {
 					condition, err = ParseBool(expression, Variables)
 				} else if tokens[i2].Type == lexer.Identifier {
 					if Variables[tokens[i2].Value.(string)] == "bool" {
 						condition = tokens[i2]
+					} else if Functions[tokens[i2].Value.(string)] == "bool" {
+						var funcCall ast.FuncCall
+						funcCall.Name = tokens[i2]
+						funcCall.Arguments = make([]any, 0)
+						i2 += 2
+						for tokens[i2].Type != lexer.CloseParen && tokens[i2].Type != lexer.NewLine {
+							var expression []lexer.Token
+
+							expression, i2 = getArgs(tokens, i2, Variables, false)
+
+							if tokens[i2].Type == lexer.Comma {
+								i2++
+							}
+							arg, _, err := ParseExpression(expression, Variables, false)
+							if err != nil {
+								return program.Statements, err
+							}
+
+							funcCall.Arguments = append(funcCall.Arguments, arg)
+							if err != nil {
+								return program.Statements, err
+							}
+						}
+						condition = funcCall
+
 					} else {
 						err = errors.New(fmt.Sprintf("Expected bool on line: %d at position %d, not '%s' in file: '%s'", tokens[i2].Line, tokens[i2].LinePos, tokens[i2].Value, tokens[i2].File))
 					}
@@ -434,6 +518,9 @@ func Parse(tokens []lexer.Token, Variables map[string]string) ([]ast.Statement, 
 						funcCall.Arguments = append(funcCall.Arguments, arg)
 						if err != nil {
 							return program.Statements, err
+						}
+						if tokens[i].Type == lexer.CloseParen && tokens[i+1].Type == lexer.Comma {
+							i += 2
 						}
 					}
 					statement.Node = funcCall
@@ -522,11 +609,16 @@ func getArgs(tokens []lexer.Token, i int, Variables map[string]string, funct boo
 				i++
 				expression = append(expression, tokens[i])
 				i++
-				var args []lexer.Token
-				args, i = getArgs(tokens, i, Variables, true)
-				expression = append(expression, args...)
-				i++
-				expression = append(expression, tokens[i])
+				if tokens[i].Type != lexer.CloseParen {
+					var args []lexer.Token
+					args, i = getArgs(tokens, i, Variables, true)
+					expression = append(expression, args...)
+					i++
+					expression = append(expression, tokens[i])
+
+				} else {
+					expression = append(expression, tokens[i])
+				}
 
 			} else {
 				expression = append(expression, tokens[i])
@@ -570,14 +662,16 @@ func IsNumber(token lexer.Token, Variables map[string]string) bool {
 	case token.Type == lexer.Int:
 		return true
 	case token.Type == lexer.Identifier:
-		if Variables[token.Value.(string)] == "int" {
+		if Variables[token.Value.(string)] == "int" || Variables[token.Value.(string)] == "float" {
 			return true
-		} else if Functions[token.Value.(string)] == "int" {
+		} else if Functions[token.Value.(string)] == "int" || Functions[token.Value.(string)] == "float" {
 			return true
-		} else if token.Value.(string) == "int" {
+		} else if token.Value.(string) == "int" || token.Value.(string) == "float" {
 			return true
 		}
 		return false
+	case token.Type == lexer.Float:
+		return true
 	default:
 		return false
 	}

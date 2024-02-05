@@ -45,6 +45,7 @@ const (
 	Keyword     //21
 	DoubleEqual //23
 	NotEqual    //24
+	Float       //25
 )
 
 var symbolMap = map[byte]TokenType{
@@ -64,7 +65,7 @@ var symbolMap = map[byte]TokenType{
 	'>':  MoreThan,
 	';':  NewLine,
 }
-var KeyWords = []string{"if", "else", "while", "func", "return", "string", "int", "float", "bool", "void", "extern_func", "true", "false", "import"}
+var KeyWords = []string{"if", "else", "while", "func", "return", "string", "int", "float", "bool", "void", "extern_func", "true", "false", "import", "external"}
 
 func AddImports(tokens []Token) []Token {
 	for i := 0; i < len(tokens); i++ {
@@ -181,7 +182,7 @@ func Lex(input string, file string) ([]Token, error) {
 			if isFloat {
 				number, _ := strconv.ParseFloat(num, 64)
 				tokens = append(tokens, Token{
-					Type:    Int,
+					Type:    Float,
 					Value:   number,
 					Line:    line,
 					LinePos: linePos,

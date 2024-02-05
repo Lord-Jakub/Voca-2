@@ -1,0 +1,21 @@
+import "graphics"
+func main(){
+    int init = graphics.Init() 
+    graphics.CreateWindow("Voca graphics", 800, 600)
+   int i = 0
+    while (graphics.IsRunning()) {
+        graphics.SetColor(255, 255, 255, 255)
+        graphics.Clear()
+        graphics.SetColor(255, 0, 0, 255)
+        graphics.CreateFillRect(i, 100, 200, 200)
+        if (graphics.MouseDown("left")) {
+            i++
+            graphics.SetColor(0, 255, 0, 255)
+            graphics.CreatePoint(graphics.MouseX(), graphics.MouseY())
+        }
+        graphics.Update()
+        delay(1000/60)
+    
+    }
+   graphics.Close()
+}
