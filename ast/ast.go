@@ -64,3 +64,23 @@ type FuncCall struct {
 	Name      lexer.Token
 	Arguments []any
 }
+
+type ArrayStatement struct {
+	Content []any
+	Length  int
+}
+
+type ArrayDeclaration struct {
+	Type   any
+	Name   lexer.Token
+	Value  any
+	Length any
+}
+type ArrayAssignment struct {
+	Name  lexer.Token
+	Value any
+}
+type ArrayType struct {
+	Type   any
+	Length any
+}

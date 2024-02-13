@@ -107,7 +107,7 @@ func Optimalisation(program compiler.Program, i int) (compiler.Program, int) {
 	return program, i
 }
 func main() {
-	program := compiler.Program{Args: os.Args, GenerateAST: false, File: "main.voc", LoadAST: false, Ir: false, Obj: false, Exec: true, Optimalisation: 0}
+	program := compiler.Program{Args: os.Args, GenerateAST: false, File: "main.voc", LoadAST: false, Ir: false, Obj: false, Exec: true, Optimalisation: 0, JustParse: false}
 	if len(program.Args) >= 1 {
 		i := 0
 		for i < len(program.Args) {
@@ -143,6 +143,8 @@ func main() {
 				program.Exec = false
 			case "-O":
 				program, i = Optimalisation(program, i)
+			case "-justParse":
+				program.JustParse = true
 
 			}
 			i++
@@ -177,6 +179,15 @@ func main() {
 		if program.GenerateAST {
 			err := astToJson(program.Program)
 			program.Errs = append(program.Errs, err)
+		}
+
+		if program.JustParse {
+			for i := 0; i < len(program.Errs); i++ {
+				if program.Errs[i] != nil {
+					fmt.Println(program.Errs[i])
+				}
+			}
+			os.Exit(0)
 		}
 
 		errs := compiler.New(program)

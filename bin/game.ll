@@ -1,3 +1,16 @@
+@str0 = global [10 x i8] c"Voca game\00"
+@str1 = global [11 x i8] c"player.png\00"
+@str2 = global [2 x i8] c"W\00"
+@str3 = global [2 x i8] c"S\00"
+@str4 = global [2 x i8] c"D\00"
+@str5 = global [2 x i8] c"A\00"
+@str6 = global [11 x i8] c"player.png\00"
+@str7 = global [2 x i8] c"W\00"
+@str8 = global [2 x i8] c"S\00"
+@str9 = global [2 x i8] c"D\00"
+@str10 = global [2 x i8] c"A\00"
+@str11 = global [12 x i8] c"Closing app\00"
+
 declare void @print(i8* %s)
 
 declare i8* @append(i8* %s1, i8* %s2)
@@ -260,97 +273,90 @@ entry:
 	%init = alloca i32
 	%0 = call i32 @graphics.Init()
 	store i32 %0, i32* %init
-	%1 = alloca [10 x i8]
-	store [10 x i8] c"Voca game\00", [10 x i8]* %1
-	%2 = getelementptr [10 x i8], [10 x i8]* %1, i32 0, i32 0
-	call void @graphics.CreateWindow(i8* %2, i32 800, i32 600)
+	store [10 x i8] c"Voca game\00", [10 x i8]* @str0
+	%1 = getelementptr [10 x i8], [10 x i8]* @str0, i32 0, i32 0
+	call void @graphics.CreateWindow(i8* %1, i32 800, i32 600)
 	%x = alloca i32
 	store i32 10, i32* %x
 	%y = alloca i32
 	store i32 10, i32* %y
-	%3 = call i1 @graphics.IsRunning()
-	br i1 %3, label %loop1, label %after1
+	%2 = call i1 @graphics.IsRunning()
+	br i1 %2, label %loop1, label %after1
 
 after1:
-	%4 = alloca [12 x i8]
-	store [12 x i8] c"Closing app\00", [12 x i8]* %4
-	%5 = getelementptr [12 x i8], [12 x i8]* %4, i32 0, i32 0
-	call void @print(i8* %5)
+	store [12 x i8] c"Closing app\00", [12 x i8]* @str11
+	%3 = getelementptr [12 x i8], [12 x i8]* @str11, i32 0, i32 0
+	call void @print(i8* %3)
 	call void @graphics.Close()
 	ret void
 
 loop1:
-	%6 = call i1 @graphics.IsRunning()
-	br i1 %6, label %loop_body1, label %after1
+	%4 = call i1 @graphics.IsRunning()
+	br i1 %4, label %loop_body1, label %after1
 
 loop_body1:
 	call void @graphics.SetColor(i32 255, i32 255, i32 255, i32 255)
 	call void @graphics.Clear()
 	call void @graphics.SetColor(i32 255, i32 0, i32 0, i32 255)
-	%7 = alloca [11 x i8]
-	store [11 x i8] c"player.png\00", [11 x i8]* %7
-	%8 = getelementptr [11 x i8], [11 x i8]* %7, i32 0, i32 0
-	%9 = load i32, i32* %x
-	%10 = load i32, i32* %y
-	call void @graphics.CreatePicture(i8* %8, i32 %9, i32 %10, i32 64, i32 64)
-	%11 = alloca [2 x i8]
-	store [2 x i8] c"W\00", [2 x i8]* %11
-	%12 = getelementptr [2 x i8], [2 x i8]* %11, i32 0, i32 0
-	%13 = call i1 @graphics.KeyPressed(i8* %12)
-	br i1 %13, label %true2, label %false2
+	store [11 x i8] c"player.png\00", [11 x i8]* @str1
+	%5 = getelementptr [11 x i8], [11 x i8]* @str1, i32 0, i32 0
+	%6 = load i32, i32* %x
+	%7 = load i32, i32* %y
+	call void @graphics.CreatePicture(i8* %5, i32 %6, i32 %7, i32 64, i32 64)
+	store [2 x i8] c"W\00", [2 x i8]* @str2
+	%8 = getelementptr [2 x i8], [2 x i8]* @str2, i32 0, i32 0
+	%9 = call i1 @graphics.KeyPressed(i8* %8)
+	br i1 %9, label %true2, label %false2
 
 true2:
-	%14 = load i32, i32* %y
-	%15 = sub i32 %14, 2
-	store i32 %15, i32* %y
+	%10 = load i32, i32* %y
+	%11 = sub i32 %10, 2
+	store i32 %11, i32* %y
 	br label %after2
 
 false2:
 	br label %after2
 
 after2:
-	%16 = alloca [2 x i8]
-	store [2 x i8] c"S\00", [2 x i8]* %16
-	%17 = getelementptr [2 x i8], [2 x i8]* %16, i32 0, i32 0
-	%18 = call i1 @graphics.KeyPressed(i8* %17)
-	br i1 %18, label %true3, label %false3
+	store [2 x i8] c"S\00", [2 x i8]* @str3
+	%12 = getelementptr [2 x i8], [2 x i8]* @str3, i32 0, i32 0
+	%13 = call i1 @graphics.KeyPressed(i8* %12)
+	br i1 %13, label %true3, label %false3
 
 true3:
-	%19 = load i32, i32* %y
-	%20 = add i32 %19, 2
-	store i32 %20, i32* %y
+	%14 = load i32, i32* %y
+	%15 = add i32 %14, 2
+	store i32 %15, i32* %y
 	br label %after3
 
 false3:
 	br label %after3
 
 after3:
-	%21 = alloca [2 x i8]
-	store [2 x i8] c"D\00", [2 x i8]* %21
-	%22 = getelementptr [2 x i8], [2 x i8]* %21, i32 0, i32 0
-	%23 = call i1 @graphics.KeyPressed(i8* %22)
-	br i1 %23, label %true4, label %false4
+	store [2 x i8] c"D\00", [2 x i8]* @str4
+	%16 = getelementptr [2 x i8], [2 x i8]* @str4, i32 0, i32 0
+	%17 = call i1 @graphics.KeyPressed(i8* %16)
+	br i1 %17, label %true4, label %false4
 
 true4:
-	%24 = load i32, i32* %x
-	%25 = add i32 %24, 2
-	store i32 %25, i32* %x
+	%18 = load i32, i32* %x
+	%19 = add i32 %18, 2
+	store i32 %19, i32* %x
 	br label %after4
 
 false4:
 	br label %after4
 
 after4:
-	%26 = alloca [2 x i8]
-	store [2 x i8] c"A\00", [2 x i8]* %26
-	%27 = getelementptr [2 x i8], [2 x i8]* %26, i32 0, i32 0
-	%28 = call i1 @graphics.KeyPressed(i8* %27)
-	br i1 %28, label %true5, label %false5
+	store [2 x i8] c"A\00", [2 x i8]* @str5
+	%20 = getelementptr [2 x i8], [2 x i8]* @str5, i32 0, i32 0
+	%21 = call i1 @graphics.KeyPressed(i8* %20)
+	br i1 %21, label %true5, label %false5
 
 true5:
-	%29 = load i32, i32* %x
-	%30 = sub i32 %29, 2
-	store i32 %30, i32* %x
+	%22 = load i32, i32* %x
+	%23 = sub i32 %22, 2
+	store i32 %23, i32* %x
 	br label %after5
 
 false5:
@@ -358,75 +364,70 @@ false5:
 
 after5:
 	call void @graphics.Update()
-	%31 = sdiv i32 1000, 60
-	call void @delay(i32 %31)
+	%24 = sdiv i32 1000, 60
+	call void @delay(i32 %24)
 	call void @graphics.SetColor(i32 255, i32 255, i32 255, i32 255)
 	call void @graphics.Clear()
 	call void @graphics.SetColor(i32 255, i32 0, i32 0, i32 255)
-	%32 = alloca [11 x i8]
-	store [11 x i8] c"player.png\00", [11 x i8]* %32
-	%33 = getelementptr [11 x i8], [11 x i8]* %32, i32 0, i32 0
-	%34 = load i32, i32* %x
-	%35 = load i32, i32* %y
-	call void @graphics.CreatePicture(i8* %33, i32 %34, i32 %35, i32 64, i32 64)
-	%36 = alloca [2 x i8]
-	store [2 x i8] c"W\00", [2 x i8]* %36
-	%37 = getelementptr [2 x i8], [2 x i8]* %36, i32 0, i32 0
-	%38 = call i1 @graphics.KeyPressed(i8* %37)
-	br i1 %38, label %true6, label %false6
+	store [11 x i8] c"player.png\00", [11 x i8]* @str6
+	%25 = getelementptr [11 x i8], [11 x i8]* @str6, i32 0, i32 0
+	%26 = load i32, i32* %x
+	%27 = load i32, i32* %y
+	call void @graphics.CreatePicture(i8* %25, i32 %26, i32 %27, i32 64, i32 64)
+	store [2 x i8] c"W\00", [2 x i8]* @str7
+	%28 = getelementptr [2 x i8], [2 x i8]* @str7, i32 0, i32 0
+	%29 = call i1 @graphics.KeyPressed(i8* %28)
+	br i1 %29, label %true6, label %false6
 
 true6:
-	%39 = load i32, i32* %y
-	%40 = sub i32 %39, 2
-	store i32 %40, i32* %y
+	%30 = load i32, i32* %y
+	%31 = sub i32 %30, 2
+	store i32 %31, i32* %y
 	br label %after6
 
 false6:
 	br label %after6
 
 after6:
-	%41 = alloca [2 x i8]
-	store [2 x i8] c"S\00", [2 x i8]* %41
-	%42 = getelementptr [2 x i8], [2 x i8]* %41, i32 0, i32 0
-	%43 = call i1 @graphics.KeyPressed(i8* %42)
-	br i1 %43, label %true7, label %false7
+	store [2 x i8] c"S\00", [2 x i8]* @str8
+	%32 = getelementptr [2 x i8], [2 x i8]* @str8, i32 0, i32 0
+	%33 = call i1 @graphics.KeyPressed(i8* %32)
+	br i1 %33, label %true7, label %false7
 
 true7:
-	%44 = load i32, i32* %y
-	%45 = add i32 %44, 2
-	store i32 %45, i32* %y
+	%34 = load i32, i32* %y
+	%35 = add i32 %34, 2
+	store i32 %35, i32* %y
 	br label %after7
 
 false7:
 	br label %after7
 
 after7:
-	%46 = alloca [2 x i8]
-	store [2 x i8] c"D\00", [2 x i8]* %46
-	%47 = getelementptr [2 x i8], [2 x i8]* %46, i32 0, i32 0
-	%48 = call i1 @graphics.KeyPressed(i8* %47)
-	br i1 %48, label %true8, label %false8
+	store [2 x i8] c"D\00", [2 x i8]* @str9
+	%36 = getelementptr [2 x i8], [2 x i8]* @str9, i32 0, i32 0
+	%37 = call i1 @graphics.KeyPressed(i8* %36)
+	br i1 %37, label %true8, label %false8
 
 true8:
-	%49 = load i32, i32* %x
-	%50 = add i32 %49, 2
-	store i32 %50, i32* %x
+	%38 = load i32, i32* %x
+	%39 = add i32 %38, 2
+	store i32 %39, i32* %x
 	br label %after8
 
 false8:
 	br label %after8
 
 after8:
-	%51 = alloca [2 x i8]
-	store [2 x i8] c"A\00", [2 x i8]* %51
-	%52 = getelementptr [2 x i8], [2 x i8]* %51, i32 0, i32 0
-	%53 = call i1 @graphics.KeyPressed(i8* %52)
-	br i1 %53, label %true9, label %false9
+	store [2 x i8] c"A\00", [2 x i8]* @str10
+	%40 = getelementptr [2 x i8], [2 x i8]* @str10, i32 0, i32 0
+	%41 = call i1 @graphics.KeyPressed(i8* %40)
+	br i1 %41, label %true9, label %false9
 
 true9:
-	%54 = load i32, i32* %x
-	%55 = sub i32 %54, 2
-	store i32 %55, i32* %x
+	%42 = load i32, i32* %x
+	%43 = sub i32 %42, 2
+	store i32 %43, i32* %x
 	br label %after9
 
 false9:
@@ -434,8 +435,8 @@ false9:
 
 after9:
 	call void @graphics.Update()
-	%56 = sdiv i32 1000, 60
-	call void @delay(i32 %56)
-	%57 = call i1 @graphics.IsRunning()
-	br i1 %57, label %loop1, label %after1
+	%44 = sdiv i32 1000, 60
+	call void @delay(i32 %44)
+	%45 = call i1 @graphics.IsRunning()
+	br i1 %45, label %loop1, label %after1
 }

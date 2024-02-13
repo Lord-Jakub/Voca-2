@@ -54,6 +54,7 @@ type Program struct {
 	Obj            bool
 	Exec           bool
 	Optimalisation int
+	JustParse      bool
 }
 
 func New(program Program) []error {
@@ -177,9 +178,11 @@ func CompileToExecutable(program Program) error {
 	return err
 
 }
+
+var module = ir.NewModule()
+
 func GenerateIR(program ast.Program) string {
 
-	var module = ir.NewModule()
 	i := 0
 	for i < len(program.Statements) {
 		statement := program.Statements[i].Node
@@ -317,6 +320,9 @@ func GenerateIR(program ast.Program) string {
 	}*/
 	return module_str
 }
+
+var strCounter int = 0
+
 func Compile(block *ir.Block, statements []ast.Statement, variables map[string]Variable) *ir.Block {
 	i := 0
 	for i < len(statements) {
@@ -355,12 +361,10 @@ func Compile(block *ir.Block, statements []ast.Statement, variables map[string]V
 
 						str, _ := CompileExpression(block, statement.(ast.VariableDeclaration).Value.(ast.ExpressionStatement), variables)
 						switch str.(type) {
-						case *constant.CharArray:
-							strvar := block.NewAlloca(types.NewArray(uint64(str.(*constant.CharArray).Typ.Len), types.I8))
-							block.NewStore(str, strvar)
-							strin := block.NewGetElementPtr(types.NewArray(uint64(str.(*constant.CharArray).Typ.Len), types.I8), strvar, constant.NewInt(types.I32, 0), constant.NewInt(types.I32, 0))
-							block.NewStore(strin, variable)
-							variab.length = int(str.(*constant.CharArray).Typ.Len)
+						case *ir.InstGetElementPtr:
+
+							block.NewStore(str, variable)
+							//variab.length = int(str.(*constant.CharArray).Typ.Len)
 						case *ir.InstCall:
 							block.NewStore(str, variable)
 
@@ -379,7 +383,9 @@ func Compile(block *ir.Block, statements []ast.Statement, variables map[string]V
 						str := constant.NewCharArrayFromString(statement.(ast.VariableDeclaration).Value.(lexer.Token).Value.(string) + "\x00")
 
 						length = int(str.Typ.Len)
-						strvar := block.NewAlloca(types.NewArray(uint64(str.Typ.Len), types.I8))
+						//strvar := block.NewAlloca(types.NewArray(uint64(str.Typ.Len), types.I8))
+						strvar := module.NewGlobalDef("str"+strconv.Itoa(strCounter), str)
+						strCounter++
 						block.NewStore(str, strvar)
 						strin := block.NewGetElementPtr(types.NewArray(uint64(length), types.I8), strvar, constant.NewInt(types.I32, 0), constant.NewInt(types.I32, 0))
 						block.NewStore(strin, variable)
@@ -444,12 +450,14 @@ func Compile(block *ir.Block, statements []ast.Statement, variables map[string]V
 
 					str, _ := CompileExpression(block, statement.(ast.VariableAssignment).Value.(ast.ExpressionStatement), variables)
 					switch str.(type) {
-					case *constant.CharArray:
-						strvar := block.NewAlloca(types.NewArray(uint64(str.(*constant.CharArray).Typ.Len), types.I8))
-						block.NewStore(str, strvar)
-						strin := block.NewGetElementPtr(types.NewArray(uint64(str.(*constant.CharArray).Typ.Len), types.I8), strvar, constant.NewInt(types.I32, 0), constant.NewInt(types.I32, 0))
-						block.NewStore(strin, variable)
-						variab.length = int(str.(*constant.CharArray).Typ.Len)
+					case *ir.InstGetElementPtr:
+						//strvar := block.NewAlloca(types.NewArray(uint64(str.(*constant.CharArray).Typ.Len), types.I8))
+						//strvar := module.NewGlobalDef("str"+strconv.Itoa(strCounter), str)
+						//strCounter++
+						//block.NewStore(str, strvar)
+						//strin := block.NewGetElementPtr(types.NewArray(uint64(str.(*constant.CharArray).Typ.Len), types.I8), strvar, constant.NewInt(types.I32, 0), constant.NewInt(types.I32, 0))
+						block.NewStore(str, variable)
+						//variab.length = int(str.(*constant.CharArray).Typ.Len)
 					case *ir.InstCall:
 						block.NewStore(str, variable)
 
@@ -469,7 +477,8 @@ func Compile(block *ir.Block, statements []ast.Statement, variables map[string]V
 					str := constant.NewCharArrayFromString(statement.(ast.VariableAssignment).Value.(lexer.Token).Value.(string) + "\x00")
 
 					length = int(str.Typ.Len)
-					strvar := block.NewAlloca(types.NewArray(uint64(str.Typ.Len), types.I8))
+					strvar := module.NewGlobalDef("str"+strconv.Itoa(strCounter), str)
+					strCounter++
 					block.NewStore(str, strvar)
 					strin := block.NewGetElementPtr(types.NewArray(uint64(length), types.I8), strvar, constant.NewInt(types.I32, 0), constant.NewInt(types.I32, 0))
 					block.NewStore(strin, variable)
@@ -586,7 +595,8 @@ func Compile(block *ir.Block, statements []ast.Statement, variables map[string]V
 					block.NewRet(constant.NewInt(types.I32, int64(value.(lexer.Token).Value.(int))))
 				} else if value.(lexer.Token).Type == lexer.String {
 					str := constant.NewCharArrayFromString(value.(lexer.Token).Value.(string) + "\x00")
-					strvar := block.NewAlloca(types.NewArray(uint64(str.Typ.Len), types.I8))
+					strvar := module.NewGlobalDef("str"+strconv.Itoa(strCounter), str)
+					strCounter++
 					block.NewStore(str, strvar)
 					strPtr := block.NewGetElementPtr(types.NewArray(uint64(str.Typ.Len), types.I8), strvar, constant.NewInt(types.I32, 0), constant.NewInt(types.I32, 0))
 					block.NewRet(strPtr)
@@ -651,7 +661,8 @@ func FuncCall(block *ir.Block, function ast.FuncCall, variables map[string]Varia
 				}
 			} else if arg.(lexer.Token).Type == lexer.String {
 				str := constant.NewCharArrayFromString(arg.(lexer.Token).Value.(string) + "\x00")
-				strvar := block.NewAlloca(types.NewArray(uint64(str.Typ.Len), types.I8))
+				strvar := module.NewGlobalDef("str"+strconv.Itoa(strCounter), str)
+				strCounter++
 				block.NewStore(str, strvar)
 				strPtr := block.NewGetElementPtr(types.NewArray(uint64(str.Typ.Len), types.I8), strvar, constant.NewInt(types.I32, 0), constant.NewInt(types.I32, 0))
 				arguments = append(arguments, strPtr)
@@ -805,20 +816,22 @@ func CompileExpression(block *ir.Block, expression ast.ExpressionStatement, vari
 						exp, _ := CompileExpression(block, expression.Right.(ast.ExpressionStatement), variables)
 						return block.NewAdd(variable, exp), "int"
 					} else if variables[expression.Left.(lexer.Token).Value.(string)].Type == "string" {
-						str1 := variables[expression.Left.(lexer.Token).Value.(string)].Value.(*constant.CharArray)
+						str1 := variables[expression.Left.(lexer.Token).Value.(string)].Value
 						str2, _ := CompileExpression(block, expression.Right.(ast.ExpressionStatement), variables)
 
-						return block.NewCall(Functions["append"].Value, block.NewGetElementPtr(types.NewArray(uint64(str1.Typ.Len), types.I8), str1, constant.NewInt(types.I32, 0), constant.NewInt(types.I32, 0)), block.NewGetElementPtr(types.NewArray(uint64(str2.(*constant.CharArray).Typ.Len), types.I8), str2, constant.NewInt(types.I32, 0), constant.NewInt(types.I32, 0))), "string"
+						return block.NewCall(Functions["append"].Value, str1, str2), "string"
 					} else if variables[expression.Left.(lexer.Token).Value.(string)].Type == "float" {
 						variable := block.NewLoad(types.Float, variables[expression.Left.(lexer.Token).Value.(string)].Value)
 						exp, _ := CompileExpression(block, expression.Right.(ast.ExpressionStatement), variables)
 						return block.NewFAdd(variable, exp), "float"
 					}
 				} else if expression.Left.(lexer.Token).Type == lexer.String {
-					str1 := constant.NewCharArrayFromString(expression.Left.(lexer.Token).Value.(string) + "\x00")
-					str2_1, _ := CompileExpression(block, expression.Right.(ast.ExpressionStatement), variables)
-					str2 := str2_1.(*constant.CharArray)
-					return block.NewCall(Functions["append"].Value, block.NewGetElementPtr(types.NewArray(uint64(str1.Typ.Len), types.I8), str1, constant.NewInt(types.I32, 0), constant.NewInt(types.I32, 0)), block.NewGetElementPtr(types.NewArray(uint64(str2.Typ.Len), types.I8), str2, constant.NewInt(types.I32, 0), constant.NewInt(types.I32, 0))), "string"
+					length := len(expression.Left.(lexer.Token).Value.(string) + "\x00")
+					str1 := module.NewGlobalDef("str"+strconv.Itoa(strCounter), constant.NewCharArrayFromString(expression.Left.(lexer.Token).Value.(string)+"\x00"))
+					strCounter++
+					str2, _ := CompileExpression(block, expression.Right.(ast.ExpressionStatement), variables)
+
+					return block.NewCall(Functions["append"].Value, block.NewGetElementPtr(types.NewArray(uint64(length), types.I8), str1, constant.NewInt(types.I32, 0), constant.NewInt(types.I32, 0)), str2), "string"
 
 				} else if expression.Left.(lexer.Token).Type == lexer.Float {
 					exp, _ := CompileExpression(block, expression.Right.(ast.ExpressionStatement), variables)
@@ -847,13 +860,17 @@ func CompileExpression(block *ir.Block, expression ast.ExpressionStatement, vari
 						return block.NewFAdd(variable, variable2), "float"
 					}
 				} else if expression.Left.(lexer.Token).Type == lexer.String && expression.Right.(lexer.Token).Type == lexer.String {
-					str1 := constant.NewCharArrayFromString(expression.Left.(lexer.Token).Value.(string) + "\x00")
-					str2 := constant.NewCharArrayFromString(expression.Right.(lexer.Token).Value.(string) + "\x00")
-					str := constant.NewCharArray(append(str1.X, str2.X...))
-					return block.NewGetElementPtr(types.NewArray(uint64(str.Typ.Len), types.I8), str, constant.NewInt(types.I32, 0), constant.NewInt(types.I32, 0)), "string"
+					str1 := expression.Left.(lexer.Token).Value.(string)
+					str2 := expression.Right.(lexer.Token).Value.(string) + "\x00"
+					str := constant.NewCharArrayFromString(str1 + str2)
+					strvar := module.NewGlobalDef("str"+strconv.Itoa(strCounter), str)
+					strCounter++
+
+					return block.NewGetElementPtr(types.NewArray(uint64(str.Typ.Len), types.I8), strvar, constant.NewInt(types.I32, 0), constant.NewInt(types.I32, 0)), "string"
 				} else if expression.Left.(lexer.Token).Type == lexer.String && expression.Right.(lexer.Token).Type == lexer.Identifier {
 					str1 := constant.NewCharArrayFromString(expression.Left.(lexer.Token).Value.(string) + "\x00")
-					str1var := block.NewAlloca(types.NewArray(uint64(str1.Typ.Len), types.I8))
+					str1var := module.NewGlobalDef("str"+strconv.Itoa(strCounter), str1)
+					strCounter++
 					block.NewStore(str1, str1var)
 					str1in := block.NewGetElementPtr(types.NewArray(uint64(str1.Typ.Len), types.I8), str1var, constant.NewInt(types.I32, 0), constant.NewInt(types.I32, 0))
 					str2 := block.NewLoad(types.I8Ptr, variables[expression.Right.(lexer.Token).Value.(string)].Value)
@@ -861,7 +878,8 @@ func CompileExpression(block *ir.Block, expression ast.ExpressionStatement, vari
 				} else if expression.Left.(lexer.Token).Type == lexer.Identifier && expression.Right.(lexer.Token).Type == lexer.String {
 					str1 := block.NewLoad(types.I8Ptr, variables[expression.Left.(lexer.Token).Value.(string)].Value)
 					str2 := constant.NewCharArrayFromString(expression.Right.(lexer.Token).Value.(string) + "\x00")
-					str2var := block.NewAlloca(types.NewArray(uint64(str2.Typ.Len), types.I8))
+					str2var := module.NewGlobalDef("str"+strconv.Itoa(strCounter), str2)
+					strCounter++
 					block.NewStore(str2, str2var)
 					str2in := block.NewGetElementPtr(types.NewArray(uint64(str2.Typ.Len), types.I8), str2var, constant.NewInt(types.I32, 0), constant.NewInt(types.I32, 0))
 					return block.NewCall(Functions["append"].Value, str1, str2in), "string"
@@ -890,7 +908,8 @@ func CompileExpression(block *ir.Block, expression ast.ExpressionStatement, vari
 					return block.NewFAdd(variable, block.NewCall(Functions[name2].Value, arguments2...)), "float"
 				} else if Functions[name2].Type == "string" && expression.Left.(lexer.Token).Type == lexer.String {
 					str := constant.NewCharArrayFromString(expression.Left.(lexer.Token).Value.(string) + "\x00")
-					strvar := block.NewAlloca(types.NewArray(uint64(str.Typ.Len), types.I8))
+					strvar := module.NewGlobalDef("str"+strconv.Itoa(strCounter), str)
+					strCounter++
 					block.NewStore(str, strvar)
 					strin := block.NewGetElementPtr(types.NewArray(uint64(str.Typ.Len), types.I8), strvar, constant.NewInt(types.I32, 0), constant.NewInt(types.I32, 0))
 					return block.NewCall(Functions["append"].Value, strin, block.NewCall(Functions[name2].Value, arguments2...)), "string"

@@ -21,31 +21,33 @@ type Token struct {
 type TokenType int
 
 const (
-	Invalid     = iota
-	OpenParen   //1
-	CloseParen  //2
-	OpenBrace   //3
-	CloseBrace  //4
-	Plus        //5
-	Minus       //6
-	Multiply    //7
-	Divide      //8
-	Backslash   //9
-	NewLine     //10
-	SingleQuote //11
-	DoubleQuote //12
-	Equal       //13
-	Not         //14
-	Comma       //15
-	LessThan    //16
-	MoreThan    //17
-	Int         //18
-	String      //19
-	Identifier  //20
-	Keyword     //21
-	DoubleEqual //23
-	NotEqual    //24
-	Float       //25
+	Invalid      = iota
+	OpenParen    //1
+	CloseParen   //2
+	OpenBrace    //3
+	CloseBrace   //4
+	Plus         //5
+	Minus        //6
+	Multiply     //7
+	Divide       //8
+	Backslash    //9
+	NewLine      //10
+	SingleQuote  //11
+	DoubleQuote  //12
+	Equal        //13
+	Not          //14
+	Comma        //15
+	LessThan     //16
+	MoreThan     //17
+	Int          //18
+	String       //19
+	Identifier   //20
+	Keyword      //21
+	DoubleEqual  //23
+	NotEqual     //24
+	Float        //25
+	OpenBracket  //26
+	CloseBracket //27
 )
 
 var symbolMap = map[byte]TokenType{
@@ -64,6 +66,8 @@ var symbolMap = map[byte]TokenType{
 	'<':  LessThan,
 	'>':  MoreThan,
 	';':  NewLine,
+	'[':  OpenBracket,
+	']':  CloseBracket,
 }
 var KeyWords = []string{"if", "else", "while", "func", "return", "string", "int", "float", "bool", "void", "extern_func", "true", "false", "import", "external"}
 
