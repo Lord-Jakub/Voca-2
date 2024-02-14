@@ -587,11 +587,29 @@ func Parse(tokens []lexer.Token, Variables map[string]string) ([]ast.Statement, 
 				}
 			} else {
 				if Variables[tokens[i].Value.(string)] != "" {
-					var variableAssignment ast.VariableAssignment
-					variableAssignment.Name = tokens[i]
-					if tokens[i+1].Type == lexer.Equal {
+					if tokens[i+1].Type == lexer.OpenBracket {
+						var arrayAssignment ast.ArrayAssignment
+						arrayAssignment.Name = tokens[i]
+						i++
+						for tokens[i].Type != lexer.Equal {
+							if tokens[i].Type == lexer.OpenBracket {
+								indexExpression := make([]lexer.Token, 0)
+								i++
+								for tokens[i].Type != lexer.CloseBracket {
+									indexExpression = append(indexExpression, tokens[i])
+									i++
+								}
+								index, _, err := ParseExpression(indexExpression, Variables, false)
+								if err != nil {
+									return program.Statements, err
+								}
+								arrayAssignment.Indexes = append(arrayAssignment.Indexes, index)
+							}
+
+							i++
+						}
+						i++
 						var expression []lexer.Token
-						i += 2
 						for (lexer.IsOperator(tokens[i+1]) || tokens[i+1].Type == lexer.OpenParen) && tokens[i].Type != lexer.NewLine {
 							if tokens[i+1].Type == lexer.OpenParen {
 								expression = append(expression, tokens[i])
@@ -620,28 +638,70 @@ func Parse(tokens []lexer.Token, Variables map[string]string) ([]ast.Statement, 
 						if tokens[i+1].Type == lexer.NewLine {
 							expression = append(expression, tokens[i])
 						}
-						value, IsNum, err := ParseExpression(expression, Variables, false)
+						value, _, err := ParseExpression(expression, Variables, false)
 						if err != nil {
 							return program.Statements, err
 						}
-						variableAssignment.Value = value
-						if IsNum {
-							if Variables[variableAssignment.Name.Value.(string)] != "int" {
-								err = errors.New(fmt.Sprintf("Expected string on line: %d at position %d, not '%s' in file '%s'", expression[0].Line, expression[0].LinePos, expression[0].Value, expression[0].File))
+						arrayAssignment.Value = value
+						statement.Node = arrayAssignment
+
+					} else {
+						var variableAssignment ast.VariableAssignment
+						variableAssignment.Name = tokens[i]
+						if tokens[i+1].Type == lexer.Equal {
+							var expression []lexer.Token
+							i += 2
+							for (lexer.IsOperator(tokens[i+1]) || tokens[i+1].Type == lexer.OpenParen) && tokens[i].Type != lexer.NewLine {
+								if tokens[i+1].Type == lexer.OpenParen {
+									expression = append(expression, tokens[i])
+									expression = append(expression, tokens[i+1])
+									i += 2
+									for tokens[i].Type != lexer.CloseParen {
+										expression = append(expression, tokens[i])
+										i++
+									}
+									if lexer.IsOperator(tokens[i+1]) {
+										expression = append(expression, tokens[i])
+										expression = append(expression, tokens[i+1])
+										i += 2
+									}
+
+								} else {
+									expression = append(expression, tokens[i])
+									expression = append(expression, tokens[i+1])
+									i += 2
+								}
+
+								if i+1 >= len(tokens) {
+									break
+								}
+							}
+							if tokens[i+1].Type == lexer.NewLine {
+								expression = append(expression, tokens[i])
+							}
+							value, IsNum, err := ParseExpression(expression, Variables, false)
+							if err != nil {
 								return program.Statements, err
 							}
-						} else {
-							if Variables[variableAssignment.Name.Value.(string)] != "string" {
-								err = errors.New(fmt.Sprintf("Expected number on line: %d at position %d, not '%s' in file '%s'", expression[0].Line, expression[0].LinePos, expression[0].Value, expression[0].File))
-								return program.Statements, err
+							variableAssignment.Value = value
+							if IsNum {
+								if Variables[variableAssignment.Name.Value.(string)] != "int" {
+									err = errors.New(fmt.Sprintf("Expected string on line: %d at position %d, not '%s' in file '%s'", expression[0].Line, expression[0].LinePos, expression[0].Value, expression[0].File))
+									return program.Statements, err
+								}
+							} else {
+								if Variables[variableAssignment.Name.Value.(string)] != "string" {
+									err = errors.New(fmt.Sprintf("Expected number on line: %d at position %d, not '%s' in file '%s'", expression[0].Line, expression[0].LinePos, expression[0].Value, expression[0].File))
+									return program.Statements, err
+								}
 							}
+						} else if tokens[i+1].Type == lexer.Plus && tokens[i+2].Type == lexer.Plus {
+							variableAssignment.Value = ast.ExpressionStatement{Left: tokens[i], Operator: tokens[i+1], Right: lexer.Token{Type: lexer.Int, Value: 1}}
+						} else if tokens[i+1].Type == lexer.Minus && tokens[i+2].Type == lexer.Minus {
+							variableAssignment.Value = ast.ExpressionStatement{Left: tokens[i], Operator: tokens[i+1], Right: lexer.Token{Type: lexer.Int, Value: 1}}
 						}
-					} else if tokens[i+1].Type == lexer.Plus && tokens[i+2].Type == lexer.Plus {
-						variableAssignment.Value = ast.ExpressionStatement{Left: tokens[i], Operator: tokens[i+1], Right: lexer.Token{Type: lexer.Int, Value: 1}}
-					} else if tokens[i+1].Type == lexer.Minus && tokens[i+2].Type == lexer.Minus {
-						variableAssignment.Value = ast.ExpressionStatement{Left: tokens[i], Operator: tokens[i+1], Right: lexer.Token{Type: lexer.Int, Value: 1}}
+						statement.Node = variableAssignment
 					}
-					statement.Node = variableAssignment
 				} else {
 					err = errors.New(fmt.Sprintf("Variable '%s' not declered on line: %d at position %d in file: '%s'", tokens[i].Value, tokens[i].Line, tokens[i].LinePos, tokens[i].File))
 					return program.Statements, err

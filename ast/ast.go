@@ -77,8 +77,9 @@ type ArrayDeclaration struct {
 	Length any
 }
 type ArrayAssignment struct {
-	Name  lexer.Token
-	Value any
+	Name    lexer.Token
+	Indexes []any
+	Value   any
 }
 type ArrayType struct {
 	Type   any

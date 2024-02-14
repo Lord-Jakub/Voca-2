@@ -468,8 +468,45 @@
             "Node": {
               "Name": {
                 "Type": 20,
-                "Value": "print",
+                "Value": "i",
                 "Line": 3,
+                "LinePos": 5,
+                "File": "array.voc"
+              },
+              "Indexes": [
+                {
+                  "Type": 18,
+                  "Value": 0,
+                  "Line": 3,
+                  "LinePos": 7,
+                  "File": "array.voc"
+                },
+                {
+                  "Type": 18,
+                  "Value": 0,
+                  "Line": 3,
+                  "LinePos": 10,
+                  "File": "array.voc"
+                }
+              ],
+              "Value": {
+                "Type": 18,
+                "Value": 1,
+                "Line": 3,
+                "LinePos": 15,
+                "File": "array.voc"
+              }
+            }
+          },
+          {
+            "Node": null
+          },
+          {
+            "Node": {
+              "Name": {
+                "Type": 20,
+                "Value": "print",
+                "Line": 4,
                 "LinePos": 9,
                 "File": "array.voc"
               },
@@ -477,7 +514,7 @@
                 {
                   "Type": 20,
                   "Value": "i",
-                  "Line": 3,
+                  "Line": 4,
                   "LinePos": 11,
                   "File": "array.voc"
                 }
