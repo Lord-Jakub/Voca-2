@@ -1,0 +1,29 @@
+# Ignore testfiles
+*.voc
+*.o
+*.obj
+*.ll
+*.exe
+*.png
+/bin/*.c
+!/bin/libs/vsl/*.c
+!/bin/libs/vsl/*.obj
+!/bin/libs/vsl/*.o
+!/bin/libs/vsl/*.voc
+!/bin/code.voc
+!/bin/code.ll
+!/bin/graphics_test.voc
+!/bin/voca.exe
+!main.voc
+!main.ll
+
+
+
+# Ignore graphics library
+/bin/libs/graphics/
+
+# Ignore Debug libs
+/libs/
+
+#Ignore debug files
+lcc.exe
