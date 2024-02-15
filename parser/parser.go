@@ -822,7 +822,7 @@ func IsNumber(token lexer.Token, Variables map[string]string) bool {
 	case token.Type == lexer.Int:
 		return true
 	case token.Type == lexer.Identifier:
-		if Variables[token.Value.(string)] == "int" || Variables[token.Value.(string)] == "float" {
+		if Variables[token.Value.(string)] == "int" || Variables[token.Value.(string)] == "float" || Variables[token.Value.(string)] == "array" {
 			return true
 		} else if Functions[token.Value.(string)] == "int" || Functions[token.Value.(string)] == "float" {
 			return true
@@ -1136,6 +1136,36 @@ func ParseExpression(express []lexer.Token, Variables map[string]string, parenth
 							}
 
 							expressionStatement.Right = funcCall
+						} else if Variables[fname] == "array" && express[i+1].Type == lexer.OpenBracket {
+							var ArrayCall ast.ArrayCall
+
+							ArrayCall.Name = express[i]
+							ArrayCall.Indexes = make([]any, 0)
+							i += 2
+							n := 1
+							expression := make([]lexer.Token, 0)
+							first := true
+							for express[i].Type == lexer.OpenBracket || first {
+								first = false
+								for n > 0 {
+									if express[i].Type == lexer.OpenBracket {
+										n++
+									} else if express[i].Type == lexer.CloseBracket {
+										n--
+									}
+									expression = append(expression, express[i])
+
+									i++
+								}
+								index, _, err := ParseExpression(expression, Variables, true)
+								if err != nil {
+									return expressionStatement, true, err
+								}
+								ArrayCall.Indexes = append(ArrayCall.Indexes, index)
+							}
+
+							expressionStatement.Right = ArrayCall
+
 						} else {
 							i++
 							expressionStatement.Right = express[i]
@@ -1178,6 +1208,36 @@ func ParseExpression(express []lexer.Token, Variables map[string]string, parenth
 					}
 
 					expressionStatement.Left = funcCall
+				} else if Variables[fname] == "array" && express[i+1].Type == lexer.OpenBracket {
+					var ArrayCall ast.ArrayCall
+
+					ArrayCall.Name = express[i]
+					ArrayCall.Indexes = make([]any, 0)
+					i += 2
+					n := 1
+					expression := make([]lexer.Token, 0)
+					first := true
+					for express[i].Type == lexer.OpenBracket || first {
+						first = false
+						for n > 0 {
+							if express[i].Type == lexer.OpenBracket {
+								n++
+							} else if express[i].Type == lexer.CloseBracket {
+								n--
+							}
+							expression = append(expression, express[i])
+
+							i++
+						}
+						index, _, err := ParseExpression(expression, Variables, true)
+						if err != nil {
+							return expressionStatement, true, err
+						}
+						ArrayCall.Indexes = append(ArrayCall.Indexes, index)
+					}
+
+					expressionStatement.Left = ArrayCall
+
 				} else {
 					expressionStatement.Left = express[i]
 
@@ -1219,6 +1279,36 @@ func ParseExpression(express []lexer.Token, Variables map[string]string, parenth
 						}
 
 						expressionStatement.Right = funcCall
+					} else if Variables[fname] == "array" && express[i+1].Type == lexer.OpenBracket {
+						var ArrayCall ast.ArrayCall
+
+						ArrayCall.Name = express[i]
+						ArrayCall.Indexes = make([]any, 0)
+						i += 2
+						n := 1
+						expression := make([]lexer.Token, 0)
+						first := true
+						for express[i].Type == lexer.OpenBracket || first {
+							first = false
+							for n > 0 {
+								if express[i].Type == lexer.OpenBracket {
+									n++
+								} else if express[i].Type == lexer.CloseBracket {
+									n--
+								}
+								expression = append(expression, express[i])
+
+								i++
+							}
+							index, _, err := ParseExpression(expression, Variables, true)
+							if err != nil {
+								return expressionStatement, true, err
+							}
+							ArrayCall.Indexes = append(ArrayCall.Indexes, index)
+						}
+
+						expressionStatement.Right = ArrayCall
+
 					} else {
 						expressionStatement.Right = express[i]
 					}
@@ -1347,6 +1437,45 @@ func ParseExpression(express []lexer.Token, Variables map[string]string, parenth
 				}
 
 				return funcCall, true, err
+			} else if Variables[fname] == "array" && i+1 < len(express) && express[i+1].Type == lexer.OpenBracket {
+				var ArrayCall ast.ArrayCall
+
+				ArrayCall.Name = express[i]
+				ArrayCall.Indexes = make([]any, 0)
+				i += 1
+
+				for express[i].Type == lexer.OpenBracket {
+					expression := make([]lexer.Token, 0)
+					i++
+					n := 1
+					for n > 0 {
+						if express[i].Type == lexer.OpenBracket {
+							n++
+						} else if express[i].Type == lexer.CloseBracket {
+							n--
+						}
+						if n <= 0 {
+							break
+						}
+						expression = append(expression, express[i])
+
+						i++
+					}
+
+					index, _, err := ParseExpression(expression, Variables, true)
+					if err != nil {
+						return expressionStatement, true, err
+					}
+					ArrayCall.Indexes = append(ArrayCall.Indexes, index)
+					i++
+					if i >= len(express) {
+						break
+					}
+
+				}
+
+				return ArrayCall, true, err
+
 			} else {
 				return express[i], true, err
 			}

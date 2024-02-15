@@ -512,11 +512,29 @@
               },
               "Arguments": [
                 {
-                  "Type": 20,
-                  "Value": "i",
-                  "Line": 4,
-                  "LinePos": 11,
-                  "File": "array.voc"
+                  "Name": {
+                    "Type": 20,
+                    "Value": "i",
+                    "Line": 4,
+                    "LinePos": 11,
+                    "File": "array.voc"
+                  },
+                  "Indexes": [
+                    {
+                      "Type": 18,
+                      "Value": 0,
+                      "Line": 4,
+                      "LinePos": 13,
+                      "File": "array.voc"
+                    },
+                    {
+                      "Type": 18,
+                      "Value": 0,
+                      "Line": 4,
+                      "LinePos": 16,
+                      "File": "array.voc"
+                    }
+                  ]
                 }
               ]
             }

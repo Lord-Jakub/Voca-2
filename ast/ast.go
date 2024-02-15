@@ -85,3 +85,7 @@ type ArrayType struct {
 	Type   any
 	Length any
 }
+type ArrayCall struct {
+	Name    lexer.Token
+	Indexes []any
+}
