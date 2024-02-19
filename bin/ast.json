@@ -398,10 +398,10 @@
               "Type": {
                 "Type": "int",
                 "Length": {
-                  "Type": 21,
-                  "Value": "int",
+                  "Type": 18,
+                  "Value": 2,
                   "Line": 2,
-                  "LinePos": 7,
+                  "LinePos": 10,
                   "File": "array.voc"
                 }
               },

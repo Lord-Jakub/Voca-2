@@ -28,7 +28,7 @@ var Functions = make(map[string]Function)
 var ifs = 0
 
 type Variable struct {
-	Type      string
+	Type      any
 	Value     value.Value
 	hasstring bool
 	length    int
@@ -439,6 +439,49 @@ func Compile(block *ir.Block, statements []ast.Statement, variables map[string]V
 				//block.NewStore(variables[statement.(ast.VariableDeclaration).Name.Value.(string)], variable)
 			}
 			variables[statement.(ast.VariableDeclaration).Name.Value.(string)] = variab
+		case ast.ArrayDeclaration:
+			var lenght value.Value
+			variab := Variable{}
+			if statement.(ast.ArrayDeclaration).Length != nil {
+				switch statement.(ast.ArrayDeclaration).Length.(type) {
+				case ast.ExpressionStatement:
+					exp, _ := CompileExpression(block, statement.(ast.ArrayDeclaration).Length.(ast.ExpressionStatement), variables)
+					lenght = exp
+				case lexer.Token:
+					if statement.(ast.ArrayDeclaration).Length.(lexer.Token).Type == lexer.Int {
+						lenght = constant.NewInt(types.I32, int64(statement.(ast.ArrayDeclaration).Length.(lexer.Token).Value.(int)))
+					} else if statement.(ast.ArrayDeclaration).Length.(lexer.Token).Type == lexer.Identifier {
+						lenght = block.NewLoad(types.I32, variables[statement.(ast.ArrayDeclaration).Length.(lexer.Token).Value.(string)].Value)
+					}
+				case ast.FuncCall:
+					name := statement.(ast.ArrayDeclaration).Length.(ast.FuncCall).Name.Value.(string)
+					arguments := FuncCall(block, statement.(ast.ArrayDeclaration).Length.(ast.FuncCall), variables)
+					lenght = block.NewCall(Functions[name].Value, arguments...)
+
+				}
+			}
+			var variable value.Value
+			switch statement.(ast.ArrayDeclaration).Type.(type) {
+			case string:
+				if statement.(ast.ArrayDeclaration).Type.(string) == "int" {
+					variable = block.NewAlloca(types.NewArray(uint64(lenght.(*constant.Int).X.Int64()), types.I32))
+					variab.Type = types.NewArray(uint64(lenght.(*constant.Int).X.Int64()), types.I32)
+				}
+			case ast.ArrayType:
+				var ArrType = ArrayType(statement.(ast.ArrayDeclaration).Type.(ast.ArrayType))
+				variable = block.NewAlloca(types.NewArray(uint64(lenght.(*constant.Int).X.Int64()), ArrType))
+				variab.Type = types.NewArray(uint64(lenght.(*constant.Int).X.Int64()), ArrType)
+			}
+			variable.(*ir.InstAlloca).SetName(statement.(ast.ArrayDeclaration).Name.Value.(string))
+
+			array := statement.(ast.ArrayDeclaration).Value
+			indexes := []int{0}
+			variable = CompileArrayAssigment(block, array, variables, variable, variab, indexes, 1) //.(*ir.InstAlloca)
+
+			variab.Value = variable
+			variab.length = int(lenght.(*constant.Int).X.Int64())
+			variables[statement.(ast.ArrayDeclaration).Name.Value.(string)] = variab
+
 		case ast.VariableAssignment:
 			variable := variables[statement.(ast.VariableAssignment).Name.Value.(string)].Value
 			isstring = variables[statement.(ast.VariableAssignment).Name.Value.(string)].Type == "string"
@@ -632,6 +675,75 @@ func Compile(block *ir.Block, statements []ast.Statement, variables map[string]V
 
 	return block
 }
+func CompileArrayAssigment(block *ir.Block, array ast.ArrayStatement, variables map[string]Variable, variable value.Value, variab Variable, indexes []int, curIndex int) value.Value /*, []int*/ {
+	index := 0
+	indexes = append(indexes, index)
+	for index < len(array.Content) {
+
+		switch array.Content[index].(type) {
+		case ast.ExpressionStatement:
+			//variableLoad := block.NewLoad(variab.Type.(types.Type), variable)
+			indexPtr := block.NewGetElementPtr(variab.Type.(types.Type), variable, constant.NewInt(types.I32, 0), constant.NewInt(types.I32, int64(index)))
+			exp, _ := CompileExpression(block, array.Content[index].(ast.ExpressionStatement), variables)
+			block.NewStore(exp, indexPtr)
+		case lexer.Token:
+			//variableLoad := block.NewLoad(variab.Type.(types.Type), variable)
+
+			//Ok, musím tohle nějak vyřešit, protože momentálně to bere jen array dvou dymenzí...
+
+			inexesForGep := make([]value.Value, 0)
+			for i := 0; i < len(indexes); i++ {
+				inexesForGep = append(inexesForGep, constant.NewInt(types.I32, int64(indexes[i])))
+			}
+
+			indexPtr := block.NewGetElementPtr(variab.Type.(types.Type), variable, inexesForGep...)
+			if array.Content[index].(lexer.Token).Type == lexer.Int {
+				block.NewStore(constant.NewInt(types.I32, int64(array.Content[index].(lexer.Token).Value.(int))), indexPtr)
+			}
+		case ast.FuncCall:
+			//variableLoad := block.NewLoad(variab.Type.(types.Type), variable)
+			indexPtr := block.NewGetElementPtr(variab.Type.(types.Type), variable, constant.NewInt(types.I32, 0), constant.NewInt(types.I32, int64(index)))
+			name := array.Content[index].(ast.FuncCall).Name.Value.(string)
+			arguments := FuncCall(block, array.Content[index].(ast.FuncCall), variables)
+			block.NewStore(block.NewCall(Functions[name].Value, arguments...), indexPtr)
+		case int:
+			//variableLoad := block.NewLoad(variab.Type.(types.Type), variable)
+			indexPtr := block.NewGetElementPtr(variab.Type.(types.Type), variable, constant.NewInt(types.I32, 0), constant.NewInt(types.I32, int64(index)))
+			block.NewStore(constant.NewInt(types.I32, int64(array.Content[index].(int))), indexPtr)
+		case ast.ArrayStatement:
+			//variableLoad := block.NewLoad(variab.Type.(types.Type), variable)
+			inexesForGep := make([]value.Value, 0)
+			for i := 0; i < len(indexes); i++ {
+				inexesForGep = append(inexesForGep, constant.NewInt(types.I32, int64(indexes[i])))
+			}
+
+			indexPtr := block.NewGetElementPtr(variab.Type.(types.Type), variable, inexesForGep...)
+			//arr := block.NewLoad(variab.Type.(types.Type), indexPtr)
+
+			variable /*, indexes*/ = CompileArrayAssigment(block, array.Content[index].(ast.ArrayStatement), variables, indexPtr, variab, indexes, curIndex+1)
+
+		}
+		indexes[curIndex]++
+		index++
+
+	}
+	indexes[curIndex] = 0
+	return variable /*, indexes*/
+}
+
+func ArrayType(array ast.ArrayType) types.Type {
+	var ArrType types.Type
+	switch array.Type.(type) {
+	case string:
+		if array.Type.(string) == "int" {
+			ArrType = types.NewArray(uint64(array.Length.(lexer.Token).Value.(int)), types.I32)
+		}
+	case ast.ArrayType:
+		ArrType = ArrayType(array.Type.(ast.ArrayType))
+	}
+	return ArrType
+}
+
 func FuncCall(block *ir.Block, function ast.FuncCall, variables map[string]Variable) []value.Value {
 	args := function.Arguments
 	var arguments []value.Value

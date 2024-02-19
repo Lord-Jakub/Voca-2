@@ -186,7 +186,7 @@ func Parse(tokens []lexer.Token, Variables map[string]string) ([]ast.Statement, 
 								i++
 							}
 							arr, _, _ := ParseExpression(array, Variables, false)
-							arrayDeclaration.Value = arr
+							arrayDeclaration.Value = arr.(ast.ArrayStatement)
 						}
 					}
 
@@ -744,6 +744,15 @@ func ParseArray(tokens []lexer.Token, Variables map[string]string) (any, any) {
 		for n >= 0 && tokens[n].Type != lexer.OpenBracket {
 			innerArrayLenExp = append(innerArrayLenExp, tokens[n])
 			n--
+		}
+		if len(innerArrayLenExp) == 1 {
+			n = 2
+			innerArrayLenExp = make([]lexer.Token, 0)
+			for n < len(tokens) && tokens[n].Type != lexer.CloseBracket {
+				innerArrayLenExp = append(innerArrayLenExp, tokens[n])
+				n++
+			}
+
 		}
 		var innerLength any
 		innerLength, _, _ = ParseExpression(innerArrayLenExp, Variables, false)

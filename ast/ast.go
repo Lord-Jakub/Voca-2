@@ -73,7 +73,7 @@ type ArrayStatement struct {
 type ArrayDeclaration struct {
 	Type   any
 	Name   lexer.Token
-	Value  any
+	Value  ArrayStatement
 	Length any
 }
 type ArrayAssignment struct {
