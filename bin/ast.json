@@ -514,25 +514,36 @@
                 {
                   "Name": {
                     "Type": 20,
-                    "Value": "i",
+                    "Value": "IntToString",
                     "Line": 4,
-                    "LinePos": 11,
+                    "LinePos": 21,
                     "File": "array.voc"
                   },
-                  "Indexes": [
+                  "Arguments": [
                     {
-                      "Type": 18,
-                      "Value": 0,
-                      "Line": 4,
-                      "LinePos": 13,
-                      "File": "array.voc"
-                    },
-                    {
-                      "Type": 18,
-                      "Value": 0,
-                      "Line": 4,
-                      "LinePos": 16,
-                      "File": "array.voc"
+                      "Name": {
+                        "Type": 20,
+                        "Value": "i",
+                        "Line": 4,
+                        "LinePos": 23,
+                        "File": "array.voc"
+                      },
+                      "Indexes": [
+                        {
+                          "Type": 18,
+                          "Value": 0,
+                          "Line": 4,
+                          "LinePos": 25,
+                          "File": "array.voc"
+                        },
+                        {
+                          "Type": 18,
+                          "Value": 0,
+                          "Line": 4,
+                          "LinePos": 28,
+                          "File": "array.voc"
+                        }
+                      ]
                     }
                   ]
                 }

@@ -702,17 +702,18 @@ func Compile(block *ir.Block, statements []ast.Statement, variables map[string]V
 func CompileArrayAssigment(block *ir.Block, array ast.ArrayStatement, variables map[string]Variable, variable value.Value, variab Variable, indexes []int, curIndex int) value.Value /*, []int*/ {
 	index := 0
 	indexes = append(indexes, index)
+	oldVariable := variable
 	for index < len(array.Content) {
 
 		switch array.Content[index].(type) {
 		case ast.ExpressionStatement:
 			//variableLoad := block.NewLoad(variab.Type.(types.Type), variable)
-			inexesForGep := make([]value.Value, 0)
+			/*inexesForGep := make([]value.Value, 0)
 			for i := 0; i < len(indexes); i++ {
 				inexesForGep = append(inexesForGep, constant.NewInt(types.I32, int64(indexes[i])))
 			}
-
-			indexPtr := block.NewGetElementPtr(variab.Type.(types.Type), variable, inexesForGep...)
+			*/
+			indexPtr := block.NewGetElementPtr(variable.Type().(*types.PointerType).ElemType, variable, constant.NewInt(types.I32, 0), constant.NewInt(types.I32, int64(index)))
 			exp, _ := CompileExpression(block, array.Content[index].(ast.ExpressionStatement), variables)
 			block.NewStore(exp, indexPtr)
 		case lexer.Token:
@@ -720,34 +721,34 @@ func CompileArrayAssigment(block *ir.Block, array ast.ArrayStatement, variables 
 
 			//Ok, musím tohle nějak vyřešit, protože momentálně to bere jen array dvou dymenzí...
 
-			inexesForGep := make([]value.Value, 0)
+			/*inexesForGep := make([]value.Value, 0)
 			for i := 0; i < len(indexes); i++ {
 				inexesForGep = append(inexesForGep, constant.NewInt(types.I32, int64(indexes[i])))
 			}
-
-			indexPtr := block.NewGetElementPtr(variab.Type.(types.Type), variable, inexesForGep...)
+			*/
+			indexPtr := block.NewGetElementPtr(variable.Type().(*types.PointerType).ElemType, variable, constant.NewInt(types.I32, 0), constant.NewInt(types.I32, int64(index)))
 			if array.Content[index].(lexer.Token).Type == lexer.Int {
 				block.NewStore(constant.NewInt(types.I32, int64(array.Content[index].(lexer.Token).Value.(int))), indexPtr)
 			}
 		case ast.FuncCall:
 			//variableLoad := block.NewLoad(variab.Type.(types.Type), variable)
-			inexesForGep := make([]value.Value, 0)
+			/*inexesForGep := make([]value.Value, 0)
 			for i := 0; i < len(indexes); i++ {
 				inexesForGep = append(inexesForGep, constant.NewInt(types.I32, int64(indexes[i])))
 			}
-
-			indexPtr := block.NewGetElementPtr(variab.Type.(types.Type), variable, inexesForGep...)
+			*/
+			indexPtr := block.NewGetElementPtr(variable.Type().(*types.PointerType).ElemType, variable, constant.NewInt(types.I32, 0), constant.NewInt(types.I32, int64(index)))
 			name := array.Content[index].(ast.FuncCall).Name.Value.(string)
 			arguments := FuncCall(block, array.Content[index].(ast.FuncCall), variables)
 			block.NewStore(block.NewCall(Functions[name].Value, arguments...), indexPtr)
 		case int:
 			//variableLoad := block.NewLoad(variab.Type.(types.Type), variable)
-			inexesForGep := make([]value.Value, 0)
+			/*inexesForGep := make([]value.Value, 0)
 			for i := 0; i < len(indexes); i++ {
 				inexesForGep = append(inexesForGep, constant.NewInt(types.I32, int64(indexes[i])))
 			}
-
-			indexPtr := block.NewGetElementPtr(variab.Type.(types.Type), variable, inexesForGep...)
+			*/
+			indexPtr := block.NewGetElementPtr(variable.Type().(*types.PointerType).ElemType, variable, constant.NewInt(types.I32, 0), constant.NewInt(types.I32, int64(index)))
 			block.NewStore(constant.NewInt(types.I32, int64(array.Content[index].(int))), indexPtr)
 		case ast.ArrayStatement:
 			//variableLoad := block.NewLoad(variab.Type.(types.Type), variable)
@@ -756,7 +757,7 @@ func CompileArrayAssigment(block *ir.Block, array ast.ArrayStatement, variables 
 				inexesForGep = append(inexesForGep, constant.NewInt(types.I32, int64(indexes[i])))
 			}
 
-			indexPtr := block.NewGetElementPtr(variab.Type.(types.Type), variable, inexesForGep...)
+			indexPtr := block.NewGetElementPtr(variab.Type.(types.Type), oldVariable, inexesForGep...)
 			//arr := block.NewLoad(variab.Type.(types.Type), indexPtr)
 
 			variable /*, indexes*/ = CompileArrayAssigment(block, array.Content[index].(ast.ArrayStatement), variables, indexPtr, variab, indexes, curIndex+1)
@@ -767,7 +768,7 @@ func CompileArrayAssigment(block *ir.Block, array ast.ArrayStatement, variables 
 
 	}
 	indexes[curIndex] = 0
-	return variable /*, indexes*/
+	return oldVariable /*, indexes*/
 }
 
 func ArrayType(array ast.ArrayType) types.Type {
@@ -828,6 +829,15 @@ func FuncCall(block *ir.Block, function ast.FuncCall, variables map[string]Varia
 			name2 := arg.(ast.FuncCall).Name.Value.(string)
 			args2 := FuncCall(block, arg.(ast.FuncCall), variables)
 			arguments = append(arguments, block.NewCall(Functions[name2].Value, args2...))
+		case ast.ArrayCall:
+			indexesForGep := []value.Value{constant.NewInt(types.I32, 0)}
+			for j := 0; j < len(arg.(ast.ArrayCall).Indexes); j++ {
+				indexesForGep = append(indexesForGep, constant.NewInt(types.I32, int64(arg.(ast.ArrayCall).Indexes[j].(lexer.Token).Value.(int))))
+
+			}
+			ptr := block.NewGetElementPtr(variables[arg.(ast.ArrayCall).Name.Value.(string)].Type.(types.Type), variables[arg.(ast.ArrayCall).Name.Value.(string)].Value, indexesForGep...)
+			a := block.NewLoad(types.I32, ptr)
+			arguments = append(arguments, a)
 
 		}
 	}
