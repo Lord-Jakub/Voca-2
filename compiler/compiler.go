@@ -668,6 +668,30 @@ func Compile(block *ir.Block, statements []ast.Statement, variables map[string]V
 				arguments := FuncCall(block, value.(ast.FuncCall), variables)
 				block.NewRet(block.NewCall(Functions[name].Value, arguments...))
 			}
+		case ast.ArrayAssignment:
+			arrayAssignment := statement.(ast.ArrayAssignment)
+			indexesForGep := []value.Value{constant.NewInt(types.I32, 0)}
+			for j := 0; j < len(arrayAssignment.Indexes); j++ {
+				indexesForGep = append(indexesForGep, constant.NewInt(types.I32, int64(arrayAssignment.Indexes[j].(lexer.Token).Value.(int))))
+			}
+			var val value.Value
+			switch arrayAssignment.Value.(type) {
+			case ast.ExpressionStatement:
+				val, _ = CompileExpression(block, arrayAssignment.Value.(ast.ExpressionStatement), variables)
+			case lexer.Token:
+				if arrayAssignment.Value.(lexer.Token).Type == lexer.Identifier {
+					val = block.NewLoad(types.I32, variables[arrayAssignment.Value.(lexer.Token).Value.(string)].Value)
+				} else if arrayAssignment.Value.(lexer.Token).Type == lexer.Int {
+					val = constant.NewInt(types.I32, int64(arrayAssignment.Value.(lexer.Token).Value.(int)))
+				}
+			case ast.FuncCall:
+				name := arrayAssignment.Value.(ast.FuncCall).Name.Value.(string)
+				arguments := FuncCall(block, arrayAssignment.Value.(ast.FuncCall), variables)
+				val = block.NewCall(Functions[name].Value, arguments...)
+
+			}
+			indexPtr := block.NewGetElementPtr(variables[arrayAssignment.Name.Value.(string)].Type.(types.Type), variables[arrayAssignment.Name.Value.(string)].Value, indexesForGep...)
+			block.NewStore(val, indexPtr)
 
 		}
 		i++
@@ -683,7 +707,12 @@ func CompileArrayAssigment(block *ir.Block, array ast.ArrayStatement, variables 
 		switch array.Content[index].(type) {
 		case ast.ExpressionStatement:
 			//variableLoad := block.NewLoad(variab.Type.(types.Type), variable)
-			indexPtr := block.NewGetElementPtr(variab.Type.(types.Type), variable, constant.NewInt(types.I32, 0), constant.NewInt(types.I32, int64(index)))
+			inexesForGep := make([]value.Value, 0)
+			for i := 0; i < len(indexes); i++ {
+				inexesForGep = append(inexesForGep, constant.NewInt(types.I32, int64(indexes[i])))
+			}
+
+			indexPtr := block.NewGetElementPtr(variab.Type.(types.Type), variable, inexesForGep...)
 			exp, _ := CompileExpression(block, array.Content[index].(ast.ExpressionStatement), variables)
 			block.NewStore(exp, indexPtr)
 		case lexer.Token:
@@ -702,13 +731,23 @@ func CompileArrayAssigment(block *ir.Block, array ast.ArrayStatement, variables 
 			}
 		case ast.FuncCall:
 			//variableLoad := block.NewLoad(variab.Type.(types.Type), variable)
-			indexPtr := block.NewGetElementPtr(variab.Type.(types.Type), variable, constant.NewInt(types.I32, 0), constant.NewInt(types.I32, int64(index)))
+			inexesForGep := make([]value.Value, 0)
+			for i := 0; i < len(indexes); i++ {
+				inexesForGep = append(inexesForGep, constant.NewInt(types.I32, int64(indexes[i])))
+			}
+
+			indexPtr := block.NewGetElementPtr(variab.Type.(types.Type), variable, inexesForGep...)
 			name := array.Content[index].(ast.FuncCall).Name.Value.(string)
 			arguments := FuncCall(block, array.Content[index].(ast.FuncCall), variables)
 			block.NewStore(block.NewCall(Functions[name].Value, arguments...), indexPtr)
 		case int:
 			//variableLoad := block.NewLoad(variab.Type.(types.Type), variable)
-			indexPtr := block.NewGetElementPtr(variab.Type.(types.Type), variable, constant.NewInt(types.I32, 0), constant.NewInt(types.I32, int64(index)))
+			inexesForGep := make([]value.Value, 0)
+			for i := 0; i < len(indexes); i++ {
+				inexesForGep = append(inexesForGep, constant.NewInt(types.I32, int64(indexes[i])))
+			}
+
+			indexPtr := block.NewGetElementPtr(variab.Type.(types.Type), variable, inexesForGep...)
 			block.NewStore(constant.NewInt(types.I32, int64(array.Content[index].(int))), indexPtr)
 		case ast.ArrayStatement:
 			//variableLoad := block.NewLoad(variab.Type.(types.Type), variable)
