@@ -503,55 +503,174 @@
           },
           {
             "Node": {
-              "Name": {
-                "Type": 20,
-                "Value": "print",
-                "Line": 4,
-                "LinePos": 9,
-                "File": "array.voc"
-              },
-              "Arguments": [
-                {
-                  "Name": {
-                    "Type": 20,
-                    "Value": "IntToString",
-                    "Line": 4,
-                    "LinePos": 21,
-                    "File": "array.voc"
-                  },
-                  "Arguments": [
-                    {
-                      "Name": {
-                        "Type": 20,
-                        "Value": "i",
+              "Condition": {
+                "Invert": false,
+                "Bool": {
+                  "Condition1": {
+                    "Name": {
+                      "Type": 20,
+                      "Value": "i",
+                      "Line": 4,
+                      "LinePos": 8,
+                      "File": "array.voc"
+                    },
+                    "Indexes": [
+                      {
+                        "Type": 18,
+                        "Value": 0,
                         "Line": 4,
-                        "LinePos": 23,
+                        "LinePos": 10,
                         "File": "array.voc"
                       },
-                      "Indexes": [
-                        {
-                          "Type": 18,
-                          "Value": 0,
-                          "Line": 4,
+                      {
+                        "Type": 18,
+                        "Value": 0,
+                        "Line": 4,
+                        "LinePos": 13,
+                        "File": "array.voc"
+                      }
+                    ]
+                  },
+                  "Operator": {
+                    "Type": 22,
+                    "Value": "==",
+                    "Line": 4,
+                    "LinePos": 16,
+                    "File": "array.voc"
+                  },
+                  "Condition2": {
+                    "Type": 18,
+                    "Value": 2,
+                    "Line": 4,
+                    "LinePos": 19,
+                    "File": "array.voc"
+                  }
+                }
+              },
+              "Consequence": [
+                {
+                  "Node": null
+                },
+                {
+                  "Node": {
+                    "Name": {
+                      "Type": 20,
+                      "Value": "print",
+                      "Line": 5,
+                      "LinePos": 9,
+                      "File": "array.voc"
+                    },
+                    "Arguments": [
+                      {
+                        "Name": {
+                          "Type": 20,
+                          "Value": "IntToString",
+                          "Line": 5,
+                          "LinePos": 21,
+                          "File": "array.voc"
+                        },
+                        "Arguments": [
+                          {
+                            "Name": {
+                              "Type": 20,
+                              "Value": "i",
+                              "Line": 5,
+                              "LinePos": 23,
+                              "File": "array.voc"
+                            },
+                            "Indexes": [
+                              {
+                                "Type": 18,
+                                "Value": 0,
+                                "Line": 5,
+                                "LinePos": 25,
+                                "File": "array.voc"
+                              },
+                              {
+                                "Type": 18,
+                                "Value": 0,
+                                "Line": 5,
+                                "LinePos": 28,
+                                "File": "array.voc"
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                },
+                {
+                  "Node": null
+                },
+                {
+                  "Node": null
+                },
+                {
+                  "Node": null
+                }
+              ],
+              "Alternative": [
+                {
+                  "Node": null
+                },
+                {
+                  "Node": {
+                    "Name": {
+                      "Type": 20,
+                      "Value": "print",
+                      "Line": 8,
+                      "LinePos": 13,
+                      "File": "array.voc"
+                    },
+                    "Arguments": [
+                      {
+                        "Name": {
+                          "Type": 20,
+                          "Value": "IntToString",
+                          "Line": 8,
                           "LinePos": 25,
                           "File": "array.voc"
                         },
-                        {
-                          "Type": 18,
-                          "Value": 0,
-                          "Line": 4,
-                          "LinePos": 28,
-                          "File": "array.voc"
-                        }
-                      ]
-                    }
-                  ]
+                        "Arguments": [
+                          {
+                            "Name": {
+                              "Type": 20,
+                              "Value": "i",
+                              "Line": 8,
+                              "LinePos": 27,
+                              "File": "array.voc"
+                            },
+                            "Indexes": [
+                              {
+                                "Type": 18,
+                                "Value": 1,
+                                "Line": 8,
+                                "LinePos": 29,
+                                "File": "array.voc"
+                              },
+                              {
+                                "Type": 18,
+                                "Value": 0,
+                                "Line": 8,
+                                "LinePos": 32,
+                                "File": "array.voc"
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                },
+                {
+                  "Node": null
+                },
+                {
+                  "Node": null
                 }
               ]
             }
-          },
-          {
-            "Node": null
           },
           {
             "Node": null

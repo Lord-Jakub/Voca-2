@@ -862,6 +862,8 @@ func CompileBool(block *ir.Block, condition ast.BoolStatement, variables map[str
 					con1 = block.NewLoad(types.I32, con1)
 				} else if variables[condition.Bool.(ast.BoolExpression).Condition1.(lexer.Token).Value.(string)].Type == "bool" {
 					con1 = block.NewLoad(types.I1, con1)
+				} else if variables[condition.Bool.(ast.BoolExpression).Condition1.(lexer.Token).Value.(string)].Type == "float" {
+					con1 = block.NewLoad(types.Float, con1)
 				}
 			} else if condition.Bool.(ast.BoolExpression).Condition1.(lexer.Token).Type == lexer.String {
 				con1 = constant.NewCharArrayFromString(condition.Bool.(ast.BoolExpression).Condition1.(lexer.Token).Value.(string) + "\x00")
@@ -872,6 +874,18 @@ func CompileBool(block *ir.Block, condition ast.BoolStatement, variables map[str
 			} else if condition.Bool.(ast.BoolExpression).Condition1.(lexer.Token).Type == lexer.Float {
 				con1 = constant.NewFloat(types.Float, condition.Bool.(ast.BoolExpression).Condition1.(lexer.Token).Value.(float64))
 			}
+		case ast.ArrayCall:
+			indexesForGep := []value.Value{constant.NewInt(types.I32, 0)}
+			for j := 0; j < len(condition.Bool.(ast.BoolExpression).Condition1.(ast.ArrayCall).Indexes); j++ {
+				indexesForGep = append(indexesForGep, constant.NewInt(types.I32, int64(condition.Bool.(ast.BoolExpression).Condition1.(ast.ArrayCall).Indexes[j].(lexer.Token).Value.(int))))
+			}
+			ptr := block.NewGetElementPtr(variables[condition.Bool.(ast.BoolExpression).Condition1.(ast.ArrayCall).Name.Value.(string)].Type.(types.Type), variables[condition.Bool.(ast.BoolExpression).Condition1.(ast.ArrayCall).Name.Value.(string)].Value, indexesForGep...)
+			con1 = block.NewLoad(types.I32, ptr)
+		case ast.FuncCall:
+			name := condition.Bool.(ast.BoolExpression).Condition1.(ast.FuncCall).Name.Value.(string)
+			arguments := FuncCall(block, condition.Bool.(ast.BoolExpression).Condition1.(ast.FuncCall), variables)
+			con1 = block.NewCall(Functions[name].Value, arguments...)
+
 		}
 		switch condition.Bool.(ast.BoolExpression).Condition2.(type) {
 		case ast.ExpressionStatement:
@@ -883,6 +897,12 @@ func CompileBool(block *ir.Block, condition ast.BoolStatement, variables map[str
 				con2 = variables[condition.Bool.(ast.BoolExpression).Condition2.(lexer.Token).Value.(string)].Value
 				if variables[condition.Bool.(ast.BoolExpression).Condition2.(lexer.Token).Value.(string)].Type == "string" {
 					con2 = block.NewLoad(types.NewArray(uint64(variables[condition.Bool.(ast.BoolExpression).Condition2.(lexer.Token).Value.(string)].length), types.I8), con2)
+				} else if variables[condition.Bool.(ast.BoolExpression).Condition2.(lexer.Token).Value.(string)].Type == "int" {
+					con2 = block.NewLoad(types.I32, con2)
+				} else if variables[condition.Bool.(ast.BoolExpression).Condition2.(lexer.Token).Value.(string)].Type == "bool" {
+					con2 = block.NewLoad(types.I1, con2)
+				} else if variables[condition.Bool.(ast.BoolExpression).Condition2.(lexer.Token).Value.(string)].Type == "float" {
+					con2 = block.NewLoad(types.Float, con2)
 				}
 			} else if condition.Bool.(ast.BoolExpression).Condition2.(lexer.Token).Type == lexer.String {
 				con2 = constant.NewCharArrayFromString(condition.Bool.(ast.BoolExpression).Condition2.(lexer.Token).Value.(string) + "\x00")
@@ -893,6 +913,18 @@ func CompileBool(block *ir.Block, condition ast.BoolStatement, variables map[str
 			} else if condition.Bool.(ast.BoolExpression).Condition2.(lexer.Token).Type == lexer.Float {
 				con2 = constant.NewFloat(types.Float, condition.Bool.(ast.BoolExpression).Condition2.(lexer.Token).Value.(float64))
 			}
+		case ast.ArrayCall:
+			indexesForGep := []value.Value{constant.NewInt(types.I32, 0)}
+			for j := 0; j < len(condition.Bool.(ast.BoolExpression).Condition2.(ast.ArrayCall).Indexes); j++ {
+				indexesForGep = append(indexesForGep, constant.NewInt(types.I32, int64(condition.Bool.(ast.BoolExpression).Condition2.(ast.ArrayCall).Indexes[j].(lexer.Token).Value.(int))))
+			}
+			ptr := block.NewGetElementPtr(variables[condition.Bool.(ast.BoolExpression).Condition2.(ast.ArrayCall).Name.Value.(string)].Type.(types.Type), variables[condition.Bool.(ast.BoolExpression).Condition2.(ast.ArrayCall).Name.Value.(string)].Value, indexesForGep...)
+			con2 = block.NewLoad(types.I32, ptr)
+		case ast.FuncCall:
+			name := condition.Bool.(ast.BoolExpression).Condition2.(ast.FuncCall).Name.Value.(string)
+			arguments := FuncCall(block, condition.Bool.(ast.BoolExpression).Condition2.(ast.FuncCall), variables)
+			con2 = block.NewCall(Functions[name].Value, arguments...)
+
 		}
 		if condition.Bool.(ast.BoolExpression).Operator.Type == lexer.DoubleEqual {
 			return block.NewICmp(enum.IPredEQ, con1, con2)
@@ -964,6 +996,15 @@ func CompileExpression(block *ir.Block, expression ast.ExpressionStatement, vari
 					exp, _ := CompileExpression(block, expression.Left.(ast.ExpressionStatement), variables)
 					return block.NewFAdd(exp, block.NewCall(Functions[name].Value, arguments...)), "float"
 				}
+			case ast.ArrayCall:
+				indexesForGep := []value.Value{constant.NewInt(types.I32, 0)}
+				for j := 0; j < len(expression.Right.(ast.ArrayCall).Indexes); j++ {
+					indexesForGep = append(indexesForGep, constant.NewInt(types.I32, int64(expression.Right.(ast.ArrayCall).Indexes[j].(lexer.Token).Value.(int))))
+				}
+				ptr := block.NewGetElementPtr(variables[expression.Right.(ast.ArrayCall).Name.Value.(string)].Type.(types.Type), variables[expression.Right.(ast.ArrayCall).Name.Value.(string)].Value, indexesForGep...)
+				a := block.NewLoad(types.I32, ptr)
+				exp, _ := CompileExpression(block, expression.Left.(ast.ExpressionStatement), variables)
+				return block.NewAdd(exp, a), "int"
 			}
 		case lexer.Token:
 			switch expression.Right.(type) {
@@ -1078,6 +1119,19 @@ func CompileExpression(block *ir.Block, expression ast.ExpressionStatement, vari
 					str := block.NewLoad(types.I8Ptr, variables[expression.Left.(lexer.Token).Value.(string)].Value)
 					return block.NewCall(Functions["append"].Value, str, block.NewCall(Functions[name2].Value, arguments2...)), "string"
 				}
+			case ast.ArrayCall:
+				indexesForGep := []value.Value{constant.NewInt(types.I32, 0)}
+				for j := 0; j < len(expression.Right.(ast.ArrayCall).Indexes); j++ {
+					indexesForGep = append(indexesForGep, constant.NewInt(types.I32, int64(expression.Right.(ast.ArrayCall).Indexes[j].(lexer.Token).Value.(int))))
+				}
+				ptr := block.NewGetElementPtr(variables[expression.Right.(ast.ArrayCall).Name.Value.(string)].Type.(types.Type), variables[expression.Right.(ast.ArrayCall).Name.Value.(string)].Value, indexesForGep...)
+				a := block.NewLoad(types.I32, ptr)
+				if expression.Left.(lexer.Token).Type == lexer.Int {
+					return block.NewAdd(constant.NewInt(types.I32, int64(expression.Left.(lexer.Token).Value.(int))), a), "int"
+				} else if expression.Left.(lexer.Token).Type == lexer.Identifier {
+					variable := block.NewLoad(types.I32, variables[expression.Left.(lexer.Token).Value.(string)].Value)
+					return block.NewAdd(variable, a), "int"
+				}
 
 			}
 		case ast.FuncCall:
@@ -1118,6 +1172,45 @@ func CompileExpression(block *ir.Block, expression ast.ExpressionStatement, vari
 					return block.NewFAdd(block.NewCall(Functions[name].Value, arguments...), block.NewCall(Functions[name2].Value, arguments2...)), "float"
 				}
 			}
+		case ast.ArrayCall:
+			indexesForGep := []value.Value{constant.NewInt(types.I32, 0)}
+			for j := 0; j < len(expression.Left.(ast.ArrayCall).Indexes); j++ {
+				indexesForGep = append(indexesForGep, constant.NewInt(types.I32, int64(expression.Left.(ast.ArrayCall).Indexes[j].(lexer.Token).Value.(int))))
+			}
+			ptr := block.NewGetElementPtr(variables[expression.Left.(ast.ArrayCall).Name.Value.(string)].Type.(types.Type), variables[expression.Left.(ast.ArrayCall).Name.Value.(string)].Value, indexesForGep...)
+			a := block.NewLoad(types.I32, ptr)
+			switch expression.Right.(type) {
+			case ast.ExpressionStatement:
+				exp, _ := CompileExpression(block, expression.Right.(ast.ExpressionStatement), variables)
+				return block.NewAdd(a, exp), "int"
+			case lexer.Token:
+				if expression.Right.(lexer.Token).Type == lexer.Int {
+					return block.NewAdd(a, constant.NewInt(types.I32, int64(expression.Right.(lexer.Token).Value.(int)))), "int"
+				} else if expression.Right.(lexer.Token).Type == lexer.Identifier {
+					if variables[expression.Right.(lexer.Token).Value.(string)].Type == "int" {
+						return block.NewAdd(a, block.NewLoad(types.I32, variables[expression.Right.(lexer.Token).Value.(string)].Value)), "int"
+					} else if variables[expression.Right.(lexer.Token).Value.(string)].Type == "float" {
+						return block.NewFAdd(a, block.NewLoad(types.Float, variables[expression.Right.(lexer.Token).Value.(string)].Value)), "float"
+					}
+				} else if expression.Right.(lexer.Token).Type == lexer.Float {
+					return block.NewFAdd(a, constant.NewFloat(types.Float, expression.Right.(lexer.Token).Value.(float64))), "float"
+				}
+			case ast.FuncCall:
+				name2 := expression.Right.(ast.FuncCall).Name.Value.(string)
+				arguments2 := FuncCall(block, expression.Right.(ast.FuncCall), variables)
+				if Functions[name2].Type == "int" {
+					return block.NewAdd(a, block.NewCall(Functions[name2].Value, arguments2...)), "int"
+				}
+			case ast.ArrayCall:
+				indexesForGep := []value.Value{constant.NewInt(types.I32, 0)}
+				for j := 0; j < len(expression.Right.(ast.ArrayCall).Indexes); j++ {
+					indexesForGep = append(indexesForGep, constant.NewInt(types.I32, int64(expression.Right.(ast.ArrayCall).Indexes[j].(lexer.Token).Value.(int))))
+				}
+				ptr2 := block.NewGetElementPtr(variables[expression.Right.(ast.ArrayCall).Name.Value.(string)].Type.(types.Type), variables[expression.Right.(ast.ArrayCall).Name.Value.(string)].Value, indexesForGep...)
+				a2 := block.NewLoad(types.I32, ptr2)
+				return block.NewAdd(a, a2), "int"
+			}
+
 		}
 	} else if expression.Operator.Type == lexer.Minus {
 		switch expression.Left.(type) {
@@ -1158,6 +1251,15 @@ func CompileExpression(block *ir.Block, expression ast.ExpressionStatement, vari
 					exp, _ := CompileExpression(block, expression.Left.(ast.ExpressionStatement), variables)
 					return block.NewFSub(exp, block.NewCall(Functions[name].Value, arguments...)), "float"
 				}
+			case ast.ArrayCall:
+				indexesForGep := []value.Value{constant.NewInt(types.I32, 0)}
+				for j := 0; j < len(expression.Right.(ast.ArrayCall).Indexes); j++ {
+					indexesForGep = append(indexesForGep, constant.NewInt(types.I32, int64(expression.Right.(ast.ArrayCall).Indexes[j].(lexer.Token).Value.(int))))
+				}
+				ptr := block.NewGetElementPtr(variables[expression.Right.(ast.ArrayCall).Name.Value.(string)].Type.(types.Type), variables[expression.Right.(ast.ArrayCall).Name.Value.(string)].Value, indexesForGep...)
+				a := block.NewLoad(types.I32, ptr)
+				exp, _ := CompileExpression(block, expression.Left.(ast.ExpressionStatement), variables)
+				return block.NewSub(exp, a), "int"
 			}
 		case lexer.Token:
 			switch expression.Right.(type) {
@@ -1222,6 +1324,15 @@ func CompileExpression(block *ir.Block, expression ast.ExpressionStatement, vari
 					variable := block.NewLoad(types.Float, variables[expression.Left.(lexer.Token).Value.(string)].Value)
 					return block.NewFSub(variable, block.NewCall(Functions[name2].Value, arguments2...)), "float"
 				}
+			case ast.ArrayCall:
+				indexesForGep := []value.Value{constant.NewInt(types.I32, 0)}
+				for j := 0; j < len(expression.Right.(ast.ArrayCall).Indexes); j++ {
+					indexesForGep = append(indexesForGep, constant.NewInt(types.I32, int64(expression.Right.(ast.ArrayCall).Indexes[j].(lexer.Token).Value.(int))))
+				}
+				ptr := block.NewGetElementPtr(variables[expression.Right.(ast.ArrayCall).Name.Value.(string)].Type.(types.Type), variables[expression.Right.(ast.ArrayCall).Name.Value.(string)].Value, indexesForGep...)
+				a := block.NewLoad(types.I32, ptr)
+
+				return block.NewSub(constant.NewInt(types.I32, int64(expression.Left.(lexer.Token).Value.(int))), a), "int"
 
 			}
 		case ast.FuncCall:
@@ -1256,6 +1367,44 @@ func CompileExpression(block *ir.Block, expression ast.ExpressionStatement, vari
 				} else if Functions[name].Type == "float" && Functions[name2].Type == "float" {
 					return block.NewFSub(block.NewCall(Functions[name].Value, arguments...), block.NewCall(Functions[name2].Value, arguments2...)), "float"
 				}
+			case ast.ArrayCall:
+				indexesForGep := []value.Value{constant.NewInt(types.I32, 0)}
+				for j := 0; j < len(expression.Right.(ast.ArrayCall).Indexes); j++ {
+					indexesForGep = append(indexesForGep, constant.NewInt(types.I32, int64(expression.Right.(ast.ArrayCall).Indexes[j].(lexer.Token).Value.(int))))
+				}
+				ptr := block.NewGetElementPtr(variables[expression.Right.(ast.ArrayCall).Name.Value.(string)].Type.(types.Type), variables[expression.Right.(ast.ArrayCall).Name.Value.(string)].Value, indexesForGep...)
+				a := block.NewLoad(types.I32, ptr)
+				return block.NewSub(block.NewCall(Functions[name].Value, arguments...), a), "int"
+			}
+		case ast.ArrayCall:
+			indexesForGep := []value.Value{constant.NewInt(types.I32, 0)}
+			for j := 0; j < len(expression.Left.(ast.ArrayCall).Indexes); j++ {
+				indexesForGep = append(indexesForGep, constant.NewInt(types.I32, int64(expression.Left.(ast.ArrayCall).Indexes[j].(lexer.Token).Value.(int))))
+			}
+			ptr := block.NewGetElementPtr(variables[expression.Left.(ast.ArrayCall).Name.Value.(string)].Type.(types.Type), variables[expression.Left.(ast.ArrayCall).Name.Value.(string)].Value, indexesForGep...)
+			a := block.NewLoad(types.I32, ptr)
+			switch expression.Right.(type) {
+			case ast.ExpressionStatement:
+				exp, _ := CompileExpression(block, expression.Right.(ast.ExpressionStatement), variables)
+				return block.NewSub(a, exp), "int"
+			case lexer.Token:
+				if expression.Right.(lexer.Token).Type == lexer.Int {
+					return block.NewSub(a, constant.NewInt(types.I32, int64(expression.Right.(lexer.Token).Value.(int)))), "int"
+				} else if expression.Right.(lexer.Token).Type == lexer.Identifier {
+					if variables[expression.Right.(lexer.Token).Value.(string)].Type == "int" {
+						return block.NewSub(a, block.NewLoad(types.I32, variables[expression.Right.(lexer.Token).Value.(string)].Value)), "int"
+					} else if variables[expression.Right.(lexer.Token).Value.(string)].Type == "float" {
+						return block.NewFSub(a, block.NewLoad(types.Float, variables[expression.Right.(lexer.Token).Value.(string)].Value)), "float"
+					}
+				}
+			case ast.ArrayCall:
+				indexesForGep := []value.Value{constant.NewInt(types.I32, 0)}
+				for j := 0; j < len(expression.Right.(ast.ArrayCall).Indexes); j++ {
+					indexesForGep = append(indexesForGep, constant.NewInt(types.I32, int64(expression.Right.(ast.ArrayCall).Indexes[j].(lexer.Token).Value.(int))))
+				}
+				ptr2 := block.NewGetElementPtr(variables[expression.Right.(ast.ArrayCall).Name.Value.(string)].Type.(types.Type), variables[expression.Right.(ast.ArrayCall).Name.Value.(string)].Value, indexesForGep...)
+				a2 := block.NewLoad(types.I32, ptr2)
+				return block.NewSub(a, a2), "int"
 			}
 		}
 	} else if expression.Operator.Type == lexer.Multiply {
@@ -1297,6 +1446,15 @@ func CompileExpression(block *ir.Block, expression ast.ExpressionStatement, vari
 					exp, _ := CompileExpression(block, expression.Left.(ast.ExpressionStatement), variables)
 					return block.NewFMul(exp, block.NewCall(Functions[name].Value, arguments...)), "float"
 				}
+			case ast.ArrayCall:
+				indexesForGep := []value.Value{constant.NewInt(types.I32, 0)}
+				for j := 0; j < len(expression.Right.(ast.ArrayCall).Indexes); j++ {
+					indexesForGep = append(indexesForGep, constant.NewInt(types.I32, int64(expression.Right.(ast.ArrayCall).Indexes[j].(lexer.Token).Value.(int))))
+				}
+				ptr := block.NewGetElementPtr(variables[expression.Right.(ast.ArrayCall).Name.Value.(string)].Type.(types.Type), variables[expression.Right.(ast.ArrayCall).Name.Value.(string)].Value, indexesForGep...)
+				a := block.NewLoad(types.I32, ptr)
+				exp, _ := CompileExpression(block, expression.Left.(ast.ExpressionStatement), variables)
+				return block.NewMul(exp, a), "int"
 			}
 		case lexer.Token:
 			switch expression.Right.(type) {
@@ -1361,6 +1519,15 @@ func CompileExpression(block *ir.Block, expression ast.ExpressionStatement, vari
 					variable := block.NewLoad(types.Float, variables[expression.Left.(lexer.Token).Value.(string)].Value)
 					return block.NewFMul(variable, block.NewCall(Functions[name2].Value, arguments2...)), "float"
 				}
+			case ast.ArrayCall:
+				indexesForGep := []value.Value{constant.NewInt(types.I32, 0)}
+				for j := 0; j < len(expression.Right.(ast.ArrayCall).Indexes); j++ {
+					indexesForGep = append(indexesForGep, constant.NewInt(types.I32, int64(expression.Right.(ast.ArrayCall).Indexes[j].(lexer.Token).Value.(int))))
+				}
+				ptr := block.NewGetElementPtr(variables[expression.Right.(ast.ArrayCall).Name.Value.(string)].Type.(types.Type), variables[expression.Right.(ast.ArrayCall).Name.Value.(string)].Value, indexesForGep...)
+				a := block.NewLoad(types.I32, ptr)
+
+				return block.NewMul(constant.NewInt(types.I32, int64(expression.Left.(lexer.Token).Value.(int))), a), "int"
 
 			}
 		case ast.FuncCall:
@@ -1395,6 +1562,44 @@ func CompileExpression(block *ir.Block, expression ast.ExpressionStatement, vari
 				} else if Functions[name].Type == "float" && Functions[name2].Type == "float" {
 					return block.NewFMul(block.NewCall(Functions[name].Value, arguments...), block.NewCall(Functions[name2].Value, arguments2...)), "float"
 				}
+			case ast.ArrayCall:
+				indexesForGep := []value.Value{constant.NewInt(types.I32, 0)}
+				for j := 0; j < len(expression.Right.(ast.ArrayCall).Indexes); j++ {
+					indexesForGep = append(indexesForGep, constant.NewInt(types.I32, int64(expression.Right.(ast.ArrayCall).Indexes[j].(lexer.Token).Value.(int))))
+				}
+				ptr := block.NewGetElementPtr(variables[expression.Right.(ast.ArrayCall).Name.Value.(string)].Type.(types.Type), variables[expression.Right.(ast.ArrayCall).Name.Value.(string)].Value, indexesForGep...)
+				a := block.NewLoad(types.I32, ptr)
+				return block.NewMul(block.NewCall(Functions[name].Value, arguments...), a), "int"
+			}
+		case ast.ArrayCall:
+			indexesForGep := []value.Value{constant.NewInt(types.I32, 0)}
+			for j := 0; j < len(expression.Left.(ast.ArrayCall).Indexes); j++ {
+				indexesForGep = append(indexesForGep, constant.NewInt(types.I32, int64(expression.Left.(ast.ArrayCall).Indexes[j].(lexer.Token).Value.(int))))
+			}
+			ptr := block.NewGetElementPtr(variables[expression.Left.(ast.ArrayCall).Name.Value.(string)].Type.(types.Type), variables[expression.Left.(ast.ArrayCall).Name.Value.(string)].Value, indexesForGep...)
+			a := block.NewLoad(types.I32, ptr)
+			switch expression.Right.(type) {
+			case ast.ExpressionStatement:
+				exp, _ := CompileExpression(block, expression.Right.(ast.ExpressionStatement), variables)
+				return block.NewMul(a, exp), "int"
+			case lexer.Token:
+				if expression.Right.(lexer.Token).Type == lexer.Int {
+					return block.NewMul(a, constant.NewInt(types.I32, int64(expression.Right.(lexer.Token).Value.(int)))), "int"
+				} else if expression.Right.(lexer.Token).Type == lexer.Identifier {
+					if variables[expression.Right.(lexer.Token).Value.(string)].Type == "int" {
+						return block.NewMul(a, block.NewLoad(types.I32, variables[expression.Right.(lexer.Token).Value.(string)].Value)), "int"
+					} else if variables[expression.Right.(lexer.Token).Value.(string)].Type == "float" {
+						return block.NewFMul(a, block.NewLoad(types.Float, variables[expression.Right.(lexer.Token).Value.(string)].Value)), "float"
+					}
+				}
+			case ast.ArrayCall:
+				indexesForGep := []value.Value{constant.NewInt(types.I32, 0)}
+				for j := 0; j < len(expression.Right.(ast.ArrayCall).Indexes); j++ {
+					indexesForGep = append(indexesForGep, constant.NewInt(types.I32, int64(expression.Right.(ast.ArrayCall).Indexes[j].(lexer.Token).Value.(int))))
+				}
+				ptr2 := block.NewGetElementPtr(variables[expression.Right.(ast.ArrayCall).Name.Value.(string)].Type.(types.Type), variables[expression.Right.(ast.ArrayCall).Name.Value.(string)].Value, indexesForGep...)
+				a2 := block.NewLoad(types.I32, ptr2)
+				return block.NewMul(a, a2), "int"
 			}
 		}
 	} else if expression.Operator.Type == lexer.Divide {
@@ -1436,6 +1641,15 @@ func CompileExpression(block *ir.Block, expression ast.ExpressionStatement, vari
 					exp, _ := CompileExpression(block, expression.Left.(ast.ExpressionStatement), variables)
 					return block.NewFDiv(exp, block.NewCall(Functions[name].Value, arguments...)), "float"
 				}
+			case ast.ArrayCall:
+				indexesForGep := []value.Value{constant.NewInt(types.I32, 0)}
+				for j := 0; j < len(expression.Right.(ast.ArrayCall).Indexes); j++ {
+					indexesForGep = append(indexesForGep, constant.NewInt(types.I32, int64(expression.Right.(ast.ArrayCall).Indexes[j].(lexer.Token).Value.(int))))
+				}
+				ptr := block.NewGetElementPtr(variables[expression.Right.(ast.ArrayCall).Name.Value.(string)].Type.(types.Type), variables[expression.Right.(ast.ArrayCall).Name.Value.(string)].Value, indexesForGep...)
+				a := block.NewLoad(types.I32, ptr)
+				exp, _ := CompileExpression(block, expression.Left.(ast.ExpressionStatement), variables)
+				return block.NewSDiv(exp, a), "int"
 			}
 		case lexer.Token:
 			switch expression.Right.(type) {
@@ -1500,6 +1714,15 @@ func CompileExpression(block *ir.Block, expression ast.ExpressionStatement, vari
 					variable := block.NewLoad(types.Float, variables[expression.Left.(lexer.Token).Value.(string)].Value)
 					return block.NewFDiv(variable, block.NewCall(Functions[name2].Value, arguments2...)), "float"
 				}
+			case ast.ArrayCall:
+				indexesForGep := []value.Value{constant.NewInt(types.I32, 0)}
+				for j := 0; j < len(expression.Right.(ast.ArrayCall).Indexes); j++ {
+					indexesForGep = append(indexesForGep, constant.NewInt(types.I32, int64(expression.Right.(ast.ArrayCall).Indexes[j].(lexer.Token).Value.(int))))
+				}
+				ptr := block.NewGetElementPtr(variables[expression.Right.(ast.ArrayCall).Name.Value.(string)].Type.(types.Type), variables[expression.Right.(ast.ArrayCall).Name.Value.(string)].Value, indexesForGep...)
+				a := block.NewLoad(types.I32, ptr)
+
+				return block.NewSDiv(constant.NewInt(types.I32, int64(expression.Left.(lexer.Token).Value.(int))), a), "int"
 
 			}
 		case ast.FuncCall:
@@ -1534,6 +1757,44 @@ func CompileExpression(block *ir.Block, expression ast.ExpressionStatement, vari
 				} else if Functions[name].Type == "float" && Functions[name2].Type == "float" {
 					return block.NewFDiv(block.NewCall(Functions[name].Value, arguments...), block.NewCall(Functions[name2].Value, arguments2...)), "float"
 				}
+			case ast.ArrayCall:
+				indexesForGep := []value.Value{constant.NewInt(types.I32, 0)}
+				for j := 0; j < len(expression.Right.(ast.ArrayCall).Indexes); j++ {
+					indexesForGep = append(indexesForGep, constant.NewInt(types.I32, int64(expression.Right.(ast.ArrayCall).Indexes[j].(lexer.Token).Value.(int))))
+				}
+				ptr := block.NewGetElementPtr(variables[expression.Right.(ast.ArrayCall).Name.Value.(string)].Type.(types.Type), variables[expression.Right.(ast.ArrayCall).Name.Value.(string)].Value, indexesForGep...)
+				a := block.NewLoad(types.I32, ptr)
+				return block.NewSDiv(block.NewCall(Functions[name].Value, arguments...), a), "int"
+			}
+		case ast.ArrayCall:
+			indexesForGep := []value.Value{constant.NewInt(types.I32, 0)}
+			for j := 0; j < len(expression.Left.(ast.ArrayCall).Indexes); j++ {
+				indexesForGep = append(indexesForGep, constant.NewInt(types.I32, int64(expression.Left.(ast.ArrayCall).Indexes[j].(lexer.Token).Value.(int))))
+			}
+			ptr := block.NewGetElementPtr(variables[expression.Left.(ast.ArrayCall).Name.Value.(string)].Type.(types.Type), variables[expression.Left.(ast.ArrayCall).Name.Value.(string)].Value, indexesForGep...)
+			a := block.NewLoad(types.I32, ptr)
+			switch expression.Right.(type) {
+			case ast.ExpressionStatement:
+				exp, _ := CompileExpression(block, expression.Right.(ast.ExpressionStatement), variables)
+				return block.NewSDiv(a, exp), "int"
+			case lexer.Token:
+				if expression.Right.(lexer.Token).Type == lexer.Int {
+					return block.NewSDiv(a, constant.NewInt(types.I32, int64(expression.Right.(lexer.Token).Value.(int)))), "int"
+				} else if expression.Right.(lexer.Token).Type == lexer.Identifier {
+					if variables[expression.Right.(lexer.Token).Value.(string)].Type == "int" {
+						return block.NewSDiv(a, block.NewLoad(types.I32, variables[expression.Right.(lexer.Token).Value.(string)].Value)), "int"
+					} else if variables[expression.Right.(lexer.Token).Value.(string)].Type == "float" {
+						return block.NewFDiv(a, block.NewLoad(types.Float, variables[expression.Right.(lexer.Token).Value.(string)].Value)), "float"
+					}
+				}
+			case ast.ArrayCall:
+				indexesForGep := []value.Value{constant.NewInt(types.I32, 0)}
+				for j := 0; j < len(expression.Right.(ast.ArrayCall).Indexes); j++ {
+					indexesForGep = append(indexesForGep, constant.NewInt(types.I32, int64(expression.Right.(ast.ArrayCall).Indexes[j].(lexer.Token).Value.(int))))
+				}
+				ptr2 := block.NewGetElementPtr(variables[expression.Right.(ast.ArrayCall).Name.Value.(string)].Type.(types.Type), variables[expression.Right.(ast.ArrayCall).Name.Value.(string)].Value, indexesForGep...)
+				a2 := block.NewLoad(types.I32, ptr2)
+				return block.NewSDiv(a, a2), "int"
 			}
 		}
 	}
